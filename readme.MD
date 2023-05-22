@@ -18,7 +18,10 @@ To start the project:
 3. change the `example.env` file name to `.env` and edit it, filling all the environmental variables
 4. once all `.env` variables are set properly, run `npm start` 
 
-Screenshots: Screenshots or a GIF of your project in action.
+## Screenshots:
+
+To be published soon. Cross your fingers.
+
 ## Technology used:
 
 ### Frontend 
