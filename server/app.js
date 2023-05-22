@@ -14,7 +14,7 @@ dotenv.config();
 const app = express();
 
 // database setup
-const mongoUri = process.env.MONGODB_URI || `mongodb+srv://xpro-user:${process.env.MONGO_PASSWORD}@cluster0.zezgzyy.mongodb.net/?retryWrites=true&w=majority`;
+const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
 const mongooseConfigs = { useNewUrlParser: true, useUnifiedTopology: true };
 mongoose.connect(mongoUri, mongooseConfigs)
   .then(() => console.log('Connected to MongoDB'))
