@@ -1,41 +1,18 @@
 import React, {useState, useEffect} from "react";
-//import {firebase, auth, signInWithEmailAndPassword}  from '../firebase';
+import { UserContext } from "./Context";
 
 import { Card } from "./Card";
+import * as APIClient from "../comms/APIClient";
 
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
-import firebase from 'firebase/app';
-import 'firebase/auth';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyABVg9VyGIfZSxvp-ueNL_0HvPH5yMQprg",
-  authDomain: "qwerty-40e94.firebaseapp.com",
-  databaseURL: "https://qwerty-40e94-default-rtdb.firebaseio.com",
-  projectId: "qwerty-40e94",
-  storageBucket: "qwerty-40e94.appspot.com",
-  messagingSenderId: "95281575596",
-  appId: "1:95281575596:web:2481d742750bd44ded1109"
-}
- 
-
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-
 
 export default function Login() {
+  const ctx = React.useContext(UserContext);
 
+  const [status, setStatus] = useState( null );
   const [authUser, setAuthUser] = useState( null );
-
-
-  useEffect( () => {
-    const unregisterAuthoObserver = auth().onAuthStateChanged( (user) => {
-      setAuthUser( user );
-    });
-
-    return () => unregisterAuthoObserver();
-  }, [] );
 
 
   const formik = useFormik({
@@ -47,14 +24,19 @@ export default function Login() {
     onSubmit: (values) => {
       console.log(`Login Pressed`);
 
-      // const promise = signInWithEmailAndPassword(
-      //   formik.values.email,
-      //   formik.values.password
-      // );
-      // promise.then((resp) => {
-      //   console.log('User Login Response: ', resp);
-      // });
-      // promise.catch((e) => console.log(e.message));
+      APIClient.loginUser( values.email, values.password, (err, token) => {
+        if( err != null ) {
+          setStatus( "Invalid login or password."); 
+        }
+        else {
+          setStatus( null );
+          ctx.user = {email: values.email, token: token};
+          
+          //fetch user from mongo, we will work with it
+          //the current ctx.user, will become ctx.auth
+          window.location.href= '/#/welcome';
+        }
+      } );
     },
 
     validationSchema: Yup.object({
@@ -67,19 +49,14 @@ export default function Login() {
   });
 
   return (
-    // <div>
-    //   {isSignedIn ? (
-    //     <div>
-    //       <p>Welcome, {firebase.auth().currentUser.displayName}!</p>
-    //       <button onClick={() => firebase.auth().signOut() }>Sign out</button>
-    //     </div>
-    //   ) : (
-    //     <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={firebase.auth()} />
-    //   )}
-    // </div>
     <Card header="Login">
+      <h1>{ctx.newUser ? ctx.newUser.email : ""}</h1>
       <form onSubmit={formik.handleSubmit}>
-
+        {status ? (
+          <div className="alert alert-danger py-1 px-3 mb-1" role="alert">
+            <small>Invalid username or password</small>
+          </div>
+        ) : null}
         <div className="form-group">
           <label htmlFor="email">Email</label>
           {formik.touched.email && formik.errors.email && (

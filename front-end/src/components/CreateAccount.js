@@ -5,6 +5,7 @@ import {
   saveAllUserData,
 } from "./Context";
 import { Card } from "./Card";
+import * as APIClient from "../comms/APIClient";
 
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -47,12 +48,19 @@ export default function CreateAccount() {
     onSubmit: (values) => {
       console.log(`Submit Pressed`);
 
-      const user = { id: nanoid(), ...values };
-      initUserDataOnCreate(user);
-      console.log(user);
+      const user = { ...values };
+      APIClient.createUser( user )
+        .then( (result) => {
+          console.log('User successfully created:', result)
+          setSuccess(true);
+        })
+        .catch( (err) => {
+          console.log('User not created', err);
+          setSuccess(false);
+        })
 
-      setSuccess(true);
-      setUserList((prevNotes) => [user, ...userList]);
+      
+      //setUserList((prevNotes) => [user, ...userList]);
     },
 
     validationSchema: Yup.object({

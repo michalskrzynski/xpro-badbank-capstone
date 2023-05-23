@@ -1,16 +1,16 @@
 /* eslint-disable no-console */
-import dotenv from 'dotenv';
-import express from 'express';
-import compression from 'compression';
-import cookieParser from 'cookie-parser';
-import cors from 'cors';
-import helmet from 'helmet';
-import logger from 'morgan';
-import mongoose from 'mongoose';
-import * as routes from './routes';
-import bodyParser from 'body-parser';
+require('dotenv').config();
+const express = require('express');
+const compression = require('compression');
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
+const helmet = require('helmet');
+const logger = require('morgan');
+const mongoose = require('mongoose');
+const passport = require('passport');
+const bodyParser = require('body-parser');
+const apiRouter = require( './routes/apiV1' );
 
-dotenv.config();
 const app = express();
 
 // database setup
@@ -18,8 +18,9 @@ const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
 const mongooseConfigs = { useNewUrlParser: true, useUnifiedTopology: true };
 mongoose.connect(mongoUri, mongooseConfigs)
   .then(() => console.log('Connected to MongoDB'))
-  .catch((error) => console.log('Error connecting to MongoDB Atlas:', error)); 
+  .catch((error) => console.log('Error connecting to MongoDB:', error)); 
 
+app.use(passport.initialize());
 app.use(bodyParser.json());
 app.use(logger('dev'));
 app.use(express.json());
@@ -29,7 +30,6 @@ app.use(helmet());
 app.use(cors());
 app.use(compression());
 
-app.use('/api/v1', routes.apiV1);
-app.use('/api/users', routes.users);
+app.use('/api/v1', apiRouter);
 
 module.exports = app;

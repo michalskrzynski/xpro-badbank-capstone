@@ -4,9 +4,12 @@ import { Routes, Route, Link, HashRouter } from "react-router-dom";
 import Home from "./Home";
 import Login from "./Login";
 import CreateAccount from "./CreateAccount";
+import AllData from "./AllData";
+//PRIVATE COMPONENTS
+import Welcome from "./Welcome";
 import Deposit from "./Deposit";
 import Withdraw from "./Withdraw";
-import AllData from "./AllData";
+
 import { UserContext, getLoggedIn } from "./Context";
 
 export default function App() {
@@ -17,6 +20,7 @@ export default function App() {
 
   const menuOptions = [
     { hash:'#/', desc:'Home', default:true },
+    { hash:'#/welcome', desc:'Welcome' },
     { hash:'#/login', desc:'Login'},
     { hash:'#/create-account/', desc:'Create Account'},
     { hash:'#/deposit/', desc:'Deposit'},
@@ -64,6 +68,7 @@ export default function App() {
               <Route path="/" exact element={<Home />} />
               <Route path="/login/" element={<Login />} />
               <Route path="/create-account/" element={<CreateAccount />} />
+              <Route path="/welcome/" element={<Welcome />} />
               <Route path="/deposit/" element={<Deposit />} />
               <Route path="/withdraw/" element={<Withdraw />} />
               <Route path="/all-data/" element={<AllData />} />
