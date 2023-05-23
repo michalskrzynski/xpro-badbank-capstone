@@ -10,6 +10,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const bodyParser = require('body-parser');
 const apiRouter = require( './routes/apiV1' );
+const hcRouter = require( './routes/healthcheck' );
 
 const app = express();
 
@@ -31,5 +32,6 @@ app.use(cors());
 app.use(compression());
 
 app.use('/api/v1', apiRouter);
+app.use('/healthcheck', hcRouter);
 
 module.exports = app;

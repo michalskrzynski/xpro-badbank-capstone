@@ -14,7 +14,7 @@ router.post('/users/create', usersCreate);
  */
 const authenticate = auth.authenticate('jwt', {session: false});
 /**
- * And from now onm authenticated routes
+ * And from now on authenticated routes
  */
 
 
