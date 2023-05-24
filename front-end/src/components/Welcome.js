@@ -5,14 +5,15 @@ import { Link } from "react-router-dom";
 import { UserContext } from "./Context";
 
 export default function Welcome() {
-  const ctx = React.useContext(UserContext);
+  const {contextValue, updateContextValue} = React.useContext(UserContext);
 
   return (
     <Card
-      header={ctx.user.email}
+      header={`Welcome ${contextValue.user.name}!`}
       text={
-        <div className="d-flex mb-3">
-          You are logged in as [....]. Your balance is [....]
+        <div>
+          <p>You have been successfully logged in. </p>
+          <p>Your balance is <b>${contextValue.user.balance}</b></p>
         </div>
       }
     >

@@ -24,9 +24,9 @@ export function createUser( user ) {
     
 }
 
-export function loginUser( username, password, doWithToken ) {
+export function loginUser( email, password, doWithToken ) {
   const methodName = '/users/login';
-  const data = {username, password};
+  const data = {email, password};
   console.log( "Sending through api: ", data);
 
   return request

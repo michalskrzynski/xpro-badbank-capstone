@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import { UserContext } from "./Context";
+import { UserContext, UserContextProvider } from "./Context";
 
 import { Card } from "./Card";
 import * as APIClient from "../comms/APIClient";
@@ -8,8 +8,20 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 
 
+function decodeJwtPayload(token) {
+  // Split the JWT into three parts: header, payload, and signature
+  const parts = token.split('.');
+  // Get the encoded payload from the second part
+  const encodedPayload = parts[1];
+  const decodedPayload = atob(encodedPayload);
+  const parsedPayload = JSON.parse(decodedPayload);
+  return parsedPayload;
+}
+
+
 export default function Login() {
-  const ctx = React.useContext(UserContext);
+  const {contextValue, updateContextValue} = React.useContext(UserContext);
+  console.log( contextValue );
 
   const [status, setStatus] = useState( null );
   const [authUser, setAuthUser] = useState( null );
@@ -29,11 +41,13 @@ export default function Login() {
           setStatus( "Invalid login or password."); 
         }
         else {
-          setStatus( null );
-          ctx.user = {email: values.email, token: token};
+          const payload = decodeJwtPayload( token );
           
-          //fetch user from mongo, we will work with it
-          //the current ctx.user, will become ctx.auth
+          updateContextValue( {user: payload.user, auth: payload.aws_auth});
+          //ctx.user = payload.user;
+          //ctx.auth = payload.aws_auth;
+
+          setStatus( null );
           window.location.href= '/#/welcome';
         }
       } );
@@ -50,7 +64,7 @@ export default function Login() {
 
   return (
     <Card header="Login">
-      <h1>{ctx.newUser ? ctx.newUser.email : ""}</h1>
+      <h1>Please login</h1>
       <form onSubmit={formik.handleSubmit}>
         {status ? (
           <div className="alert alert-danger py-1 px-3 mb-1" role="alert">

@@ -1,7 +1,22 @@
 import React from 'react';
+import { useState } from 'react';
 import {initjson} from "../initdata";
 
 export const UserContext = React.createContext(null);
+
+export const UserContextProvider = ({ children }) => {
+  const [contextValue, setContextValue] = useState({ user: {name: "Guest"}} );
+
+  const updateContextValue = (newValue) => {
+    setContextValue(newValue);
+  };
+
+  return (
+    <UserContext.Provider value={{ contextValue, updateContextValue }}>
+      {children}
+    </UserContext.Provider>
+  );
+};
 
 //loads all user data from local storage and performs a fallback to defaults if none
 export function loadAllUserData() {
@@ -12,19 +27,6 @@ export function saveAllUserData( data ) {
   localStorage.setItem('users', JSON.stringify(data) );
 } 
 
-//
-// Change this method to retrieve a logged in user that will be put into context.
-// 
-export function getLoggedIn() {
-  const allUsers = loadAllUserData();
-  const loggedInUserId = localStorage.getItem('loggedInUserId');
-
-  //if anyone logged in, find him, if not set the first one in line as logged in
-  const user = loggedInUserId ? allUsers.find( u => u.id === loggedInUserId ) : allUsers[0];
-  if( !loggedInUserId ) logIn( user );
-
-  return user;
-}
 
 export function logIn( user ) {
   localStorage.setItem('loggedInUserId', user.id)

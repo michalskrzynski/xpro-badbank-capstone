@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route, Link, HashRouter } from "react-router-dom";
 
+import Nav from "./Nav"
 import Home from "./Home";
 import Login from "./Login";
 import CreateAccount from "./CreateAccount";
@@ -10,7 +11,7 @@ import Welcome from "./Welcome";
 import Deposit from "./Deposit";
 import Withdraw from "./Withdraw";
 
-import { UserContext, getLoggedIn } from "./Context";
+import { UserContextProvider } from "./Context";
 
 export default function App() {
   const [pageHash, setPageHash] = React.useState( 
@@ -18,64 +19,24 @@ export default function App() {
   );
 
 
-  const menuOptions = [
-    { hash:'#/', desc:'Home', default:true },
-    { hash:'#/welcome', desc:'Welcome' },
-    { hash:'#/login', desc:'Login'},
-    { hash:'#/create-account/', desc:'Create Account'},
-    { hash:'#/deposit/', desc:'Deposit'},
-    { hash:'#/withdraw/', desc:'Withdraw'},
-    { hash:'#/all-data/', desc:'All Data'}
-  ]
-
-  const menuElements = menuOptions.map( (o, i) => (
-    <li key={i} className={`"nav-item" ${pageHash === o.hash ? 'active' : ''}`}>
-      <Link to={o.hash.slice(1)} className={`nav-link ps-2`} onClick={() => setPageHash( o.hash )}>
-        {o.desc}
-      </Link>
-    </li>
-  ))
-
-
   return (
     <div id="content">
-      <HashRouter>
-        <nav className="navbar navbar-expand-lg navbar-light bg-light mb-2">
-          <a className="navbar-brand ps-2" href="#/">
-            Bad Bank
-          </a>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-toggle="collapse"
-            data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-
-          <div className="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul className="navbar-nav mr-auto">
-              {menuElements}
-            </ul>
+      <UserContextProvider>
+        <HashRouter>
+          <Nav pageHash={pageHash} handlePageHashChange={setPageHash} />
+          <div id="mainblock" className="m-2">
+              <Routes>
+                <Route path="/" exact element={<Home />} />
+                <Route path="/login/" element={<Login />} />
+                <Route path="/create-account/" element={<CreateAccount />} />
+                <Route path="/welcome/" element={<Welcome />} />
+                <Route path="/deposit/" element={<Deposit />} />
+                <Route path="/withdraw/" element={<Withdraw />} />
+                <Route path="/all-data/" element={<AllData />} />
+              </Routes>
           </div>
-        </nav>
-        <div id="mainblock" className="m-2">
-          <UserContext.Provider value={ {user: getLoggedIn()} }>
-            <Routes>
-              <Route path="/" exact element={<Home />} />
-              <Route path="/login/" element={<Login />} />
-              <Route path="/create-account/" element={<CreateAccount />} />
-              <Route path="/welcome/" element={<Welcome />} />
-              <Route path="/deposit/" element={<Deposit />} />
-              <Route path="/withdraw/" element={<Withdraw />} />
-              <Route path="/all-data/" element={<AllData />} />
-            </Routes>
-          </UserContext.Provider>
-        </div>
-      </HashRouter>
+        </HashRouter>
+      </UserContextProvider>
       <hr />
       <footer>
         <div className="p-2">
