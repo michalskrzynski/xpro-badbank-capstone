@@ -4,7 +4,8 @@ const router = express.Router();
 const auth = require ('../impl/auth-impl');
 const usersCreate = require('../controllers/users-create');
 const usersLogin = require('../controllers/users-login');
-
+const usersDeposit = require('../controllers/users-deposit');
+const usersWithdraw = require('../controllers/users-withdraw');
 
 router.post('/users/login', usersLogin );
 router.post('/users/create', usersCreate);
@@ -18,16 +19,20 @@ const authenticate = auth.authenticate('jwt', {session: false});
  */
 
 
-router.post('/users/:id/deposit', authenticate, (req,res) => {
+/**
+ * Middleware checking the amount param.
+ */
+function amountParam( req, res, next ) {
+  const amount = Number(req.body.amount);
 
-  const resData = { ...req.body, balance: "999.99"}
+  if( isNaN( amount ) ) return res.status(410).send("'amount' parameter is NaN error.");
 
-  res.send({ message: "ok", data: resData });
-})
+  req.amount = amount;
+  next();
+} 
 
-router.post('/users/:id/withdraw', authenticate, (req, res) => {
-  res.send({ message: "ok", data: req.body });
-})
+router.post('/users/deposit', authenticate, amountParam, usersDeposit );
+router.post('/users/withdraw', authenticate, amountParam, usersWithdraw );
 
 
 module.exports = router;

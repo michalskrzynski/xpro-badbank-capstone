@@ -47,7 +47,7 @@ const localStrategy = new LocalStrategy( {
           IdToken: data.AuthenticationResult.IdToken
         }
 
-        const payload = { aws_auth: auth, user }
+        const payload = { aws_auth: auth, userId: user.id }
         const options = {expiresIn: '1h'};
         const token = jwt.sign(payload, process.env.JWT_SECRET, options);
     
@@ -78,7 +78,7 @@ const jwtStrategy = new JwtStrategy(
       return done(null, false, '/auth/refresh'); //the last parameter adds to 401 header WWW-authenticate
     }
 
-    if ( !payload.aws_auth || !payload.user) {
+    if ( !payload.aws_auth || !payload.userId) {
       console.log( "Login wrong payload: ", payload );
       return done(null, false);
     }
