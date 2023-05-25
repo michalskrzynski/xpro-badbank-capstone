@@ -1,4 +1,4 @@
-const auth = require('../impl/auth-impl');
+const {auth} = require('../impl/auth-impl');
 
 async function usersLogin(req, res, next) {
   

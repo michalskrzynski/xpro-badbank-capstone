@@ -21,20 +21,8 @@ import request from "superagent";
 
 
 export default function Deposit() {
-  const ctx = React.useContext(UserContext);
-  console.log("Deposit context:", ctx.user);
-  const [balance, setBalance] = useState(() => ctx.user.balance);
-
-  // Each balance change:
-  // - updates the list of users and saves
-  // - yields updated user for Context
-  React.useEffect(() => {
-    const userList = loadAllUserData();
-    const theUser = userList.find((u) => u.id === ctx.user.id);
-    theUser.balance = balance;
-    ctx.user = theUser;
-    saveAllUserData(userList);
-  }, [balance]);
+  const {contextValue, updateContextValue} = React.useContext(UserContext);
+  const [balance, setBalance] = useState(() => contextValue.user.balance);
 
 
   const handleMoneyAccepted = ( amount ) => {
@@ -60,7 +48,7 @@ export default function Deposit() {
 
   return (
     <Card
-      header={`${ctx.user.name}, deposit:`}
+      header={`${contextValue.user.name}, deposit:`}
       title={`Current balance: ${balance}`}
     >
       <CashierForm

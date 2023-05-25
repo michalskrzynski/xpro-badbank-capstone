@@ -8,20 +8,8 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 
 
-function decodeJwtPayload(token) {
-  // Split the JWT into three parts: header, payload, and signature
-  const parts = token.split('.');
-  // Get the encoded payload from the second part
-  const encodedPayload = parts[1];
-  const decodedPayload = atob(encodedPayload);
-  const parsedPayload = JSON.parse(decodedPayload);
-  return parsedPayload;
-}
-
-
 export default function Login() {
   const {contextValue, updateContextValue} = React.useContext(UserContext);
-  console.log( contextValue );
 
   const [status, setStatus] = useState( null );
   const [authUser, setAuthUser] = useState( null );
@@ -34,20 +22,12 @@ export default function Login() {
     },
 
     onSubmit: (values) => {
-      console.log(`Login Pressed`);
-
-      APIClient.loginUser( values.email, values.password, (err, token) => {
+      APIClient.loginUser( values.email, values.password, (err, payload) => {
         if( err != null ) {
           setStatus( "Invalid login or password."); 
         }
         else {
-          const payload = decodeJwtPayload( token );
-          
           updateContextValue( {user: payload.user, auth: payload.aws_auth});
-          //ctx.user = payload.user;
-          //ctx.auth = payload.aws_auth;
-
-          setStatus( null );
           window.location.href= '/#/welcome';
         }
       } );

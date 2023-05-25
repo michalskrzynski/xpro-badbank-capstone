@@ -12,11 +12,21 @@ import Deposit from "./Deposit";
 import Withdraw from "./Withdraw";
 
 import { UserContextProvider } from "./Context";
+import * as APIClient from "../comms/APIClient";
 
 export default function App() {
   const [pageHash, setPageHash] = React.useState( 
     () => window.location.hash === "" ? "#/" : window.location.hash 
   );
+
+
+  React.useEffect(() => {
+    if( APIClient.userHasBeenLoggedInBefore() ) {
+      console.log("User has been logged before, will try to login with RefreshToken");
+      
+      APIClient.refreshUser( (token) => console.log("Refresh Callback", token) ); 
+    }
+  }, []);
 
 
   return (

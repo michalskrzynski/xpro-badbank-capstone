@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
 
-const auth = require ('../impl/auth-impl');
+const {auth} = require ('../impl/auth-impl');
 const usersCreate = require('../controllers/users-create');
 const usersLogin = require('../controllers/users-login');
+const usersRefresh = require('../controllers/users-refresh');
 const usersDeposit = require('../controllers/users-deposit');
 const usersWithdraw = require('../controllers/users-withdraw');
 
+router.post('/users/refresh', usersRefresh );
 router.post('/users/login', usersLogin );
 router.post('/users/create', usersCreate);
 
