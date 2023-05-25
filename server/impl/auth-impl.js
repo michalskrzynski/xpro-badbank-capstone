@@ -104,25 +104,24 @@ async function verifyRefreshToken( rt/*, appendPayload*/ ) {
         console.log( 'Refresh Token Authentication error: ', err);
         reject( err )
       }
-      console.log( 'Refresh Token Authentication proceeding: ', data);
+
       //there are 3 tokens coming from AWS
       const { AccessToken, IdToken, RefreshToken } = data.AuthenticationResult;
       //but in the payload included in our token, we will only send 2
       const payload = { aws_auth: {AccessToken, IdToken}  };
-      // if( appendPayload ) {
-      //   const [appendName, appendValue] = appendPayload( payload );
-      //   payload['appendName'] = appendValue;
-      // }
-      const options = {expiresIn: '1h'};
-      
-      const token = jwt.sign(payload, process.env.JWT_SECRET, options);
 
-      resolve( {token, RefreshToken: rt} );
+      resolve( payload );
     });
   })
 }
-// here new strategy
+
+
+function parseJwt (token) {
+
+  return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+}
+
 
 passport.use( localStrategy ); 
 passport.use( jwtStrategy );
-module.exports = {auth: passport, verifyRefreshToken};
+module.exports = {auth: passport, verifyRefreshToken, parseJwt};

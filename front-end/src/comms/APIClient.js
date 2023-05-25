@@ -3,6 +3,7 @@ import request from 'superagent';
 const SERVER_URL = "http://localhost:3001";
 const API_PATH = "/api/v1";
 
+
 function apiMethodUrl( methodName ) {
   return SERVER_URL + API_PATH + methodName;
 }
@@ -18,6 +19,7 @@ function getRefreshToken() {
 export function userHasBeenLoggedInBefore() {
   return getRefreshToken() !== null;
 }
+
 
 function decodeJwtPayload(token) {
   // Split the JWT into three parts: header, payload, and signature
@@ -45,6 +47,8 @@ export function createUser( user ) {
     })
     
 }
+
+
 
 export function loginUser( email, password, doWithTokenPayload ) {
   const methodName = '/users/login';
@@ -78,12 +82,12 @@ export function refreshUser( doWithTokenPayload ) {
     .end( (err, response ) => {
       if( err ) {
         console.error( `API ${methodName} error`, err);
-        //doWithTokenPayload( err, null );
+        doWithTokenPayload( err, null );
       }
       else {
         console.log( `API ${methodName} responded: `, response);
-        //doWithTokenPayload( null, decodeJwtPayload(response.body.token) );
-        //saveRefreshToken(response.body.RefreshToken);
+        doWithTokenPayload( null, decodeJwtPayload(response.body.token) );
+        saveRefreshToken(response.body.RefreshToken);
       }
     });    
 }

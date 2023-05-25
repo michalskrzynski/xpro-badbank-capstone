@@ -1,8 +1,8 @@
 import User from "../models/User";
 const { ObjectId } = require('mongodb');
 
-async function find( userId ) {
-  return User.findById( userId );
+async function find( matchObj ) {
+  return User.find( matchObj );
 }
 
 async function all() {
