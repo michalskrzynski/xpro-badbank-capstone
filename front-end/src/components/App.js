@@ -13,6 +13,7 @@ import Withdraw from "./Withdraw";
 
 import { UserContextProvider, UserContext } from "./Context";
 import * as APIClient from "../comms/APIClient";
+import decodeJwt from "../misc/decodeJwt";
 
 export default function App() {
   const {contextValue, updateContextValue} = React.useContext(UserContext);
@@ -26,12 +27,13 @@ export default function App() {
     if( APIClient.userHasBeenLoggedInBefore() ) {
       console.log("User has been logged before, will try to login with RefreshToken");
       
-      APIClient.refreshUser( (err, payload) => {
+      APIClient.refreshUser( (err, token) => {
         if( err != null ) {
           alert('Login by Refresh failed.');
         }
         else {
-          updateContextValue( {user: payload.user, auth: payload.aws_auth});
+          const payload = decodeJwt(token);
+          updateContextValue( {token, user: payload.user, aws_auth: payload.aws_auth});
           window.location.href= '/#/welcome';
         }
       } );

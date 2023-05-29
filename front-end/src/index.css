@@ -12,3 +12,7 @@ nav a:hover { background-color: bisque !important; }
 nav .active {
   font-weight: bold;
 }
+
+input#amount {
+  text-align: right;
+}

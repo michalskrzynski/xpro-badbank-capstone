@@ -21,15 +21,6 @@ export function userHasBeenLoggedInBefore() {
 }
 
 
-function decodeJwtPayload(token) {
-  // Split the JWT into three parts: header, payload, and signature
-  const parts = token.split('.');
-  // Get the encoded payload from the second part
-  const encodedPayload = parts[1];
-  const decodedPayload = atob(encodedPayload);
-  const parsedPayload = JSON.parse(decodedPayload);
-  return parsedPayload;
-}
 
 
 export function createUser( user ) {
@@ -50,7 +41,8 @@ export function createUser( user ) {
 
 
 
-export function loginUser( email, password, doWithTokenPayload ) {
+
+export function loginUser( email, password, doWithToken ) {
   const methodName = '/users/login';
   const data = {email, password};
   console.log( "Sending through api: ", data);
@@ -61,17 +53,19 @@ export function loginUser( email, password, doWithTokenPayload ) {
     .end( (err, response ) => {
       if( err ) {
         console.error( `API ${methodName} error`, err);
-        doWithTokenPayload( err, null );
+        doWithToken( err, null );
       }
       else {
         console.log( `API ${methodName} responded: `, response);
-        doWithTokenPayload( null, decodeJwtPayload(response.body.token) );
+        doWithToken( null, response.body.token );
         saveRefreshToken(response.body.RefreshToken);
       }
     });    
 }
 
-export function refreshUser( doWithTokenPayload ) {
+
+
+export function refreshUser( doWithToken ) {
   const methodName = '/users/refresh';
   const data = {RefreshToken: getRefreshToken()};
   console.log('Refresh token call:', data);
@@ -82,12 +76,42 @@ export function refreshUser( doWithTokenPayload ) {
     .end( (err, response ) => {
       if( err ) {
         console.error( `API ${methodName} error`, err);
-        doWithTokenPayload( err, null );
+        doWithToken( err, null );
       }
       else {
         console.log( `API ${methodName} responded: `, response);
-        doWithTokenPayload( null, decodeJwtPayload(response.body.token) );
+        doWithToken( null, response.body.token );
         saveRefreshToken(response.body.RefreshToken);
       }
     });    
+}
+
+
+export function deposit( token, amount, cb ) {
+  const methodName = '/users/deposit';
+  const data = {amount: amount};
+
+  console.log('Deposit call:', data);
+
+  return request
+    .post( apiMethodUrl( methodName) )
+    .set('Authorization', 'Bearer ' + token)
+    .send( data )
+    .end( cb );
+
+}
+
+
+export function withdraw( token, amount, cb ) {
+  const methodName = '/users/withdraw';
+  const data = {amount: amount};
+
+  console.log('Withdraw call:', data);
+
+  return request
+    .post( apiMethodUrl( methodName) )
+    .set('Authorization', 'Bearer ' + token)
+    .send( data )
+    .end( cb );
+
 }

@@ -2,9 +2,12 @@ import React from "react";
 import { useState } from "react";
 import * as Yup from "yup";
 
-import { UserContext, loadAllUserData, saveAllUserData } from "./Context";
+import { UserContext } from "./Context";
+import * as APIClient from "../comms/APIClient";
 import { Card } from "./Card";
 import CashierForm from "./CashierForm";
+
+
 import request from "superagent";
 
 // Includes a Bootstrap card with a form that has:
@@ -24,25 +27,20 @@ export default function Deposit() {
   const {contextValue, updateContextValue} = React.useContext(UserContext);
   const [balance, setBalance] = useState(() => contextValue.user.balance);
 
-
   const handleMoneyAccepted = ( amount ) => {
-    const depositAmount = {amount};
-    request
-      .post('http://localhost:3001/api/v1/users/1/deposit')
-      .send(depositAmount)
-      .set('Content-Type', 'application/json')
-      .end( (err, res) => {
-        if(err) {
-          console.error(err);
-        }
-        else {
-          const newBalance = res.body.data.balance;
-          setBalance( newBalance )
 
-          //alert with microtimeout, for apropiate on-screen result
-          setTimeout( () => alert( `A deposit of ${amount} has been accepted. Your balance is: ${newBalance}`), 50);
-        }
-      })
+    APIClient.deposit( contextValue.token, amount, (err, response ) => {
+      if(err) console.log('ERR when depositing', err)
+      else {
+        console.log('Deposit responded with:', response);
+        contextValue.user = response.body.user;
+        updateContextValue( contextValue );
+
+        const newBalance = contextValue.user.balance;
+        setBalance( newBalance );
+        setTimeout( () => alert( `A deposit of ${response.body.deposited} has been successfully processed. Your balance is: ${newBalance}`), 50 );
+      }
+    });
   }
 
 

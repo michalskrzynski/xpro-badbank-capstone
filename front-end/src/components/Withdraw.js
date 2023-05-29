@@ -1,7 +1,8 @@
 import React from "react";
 import * as Yup from "yup"
 
-import { UserContext, loadAllUserData, saveAllUserData } from "./Context";
+import { UserContext} from "./Context";
+import * as APIClient from "../comms/APIClient";
 import { Card } from "./Card";
 import CashierForm from "./CashierForm";
 
@@ -20,33 +21,32 @@ import CashierForm from "./CashierForm";
 // OK Success Message: When a user completes the withdrawal form, they receive a success message confirming that their withdraw was processed. 
 
 export default function Withdraw() {
-  const ctx = React.useContext(UserContext);
-  const [balance, setBalance] = React.useState(() => ctx.user.balance);
+  const {contextValue, updateContextValue} = React.useContext(UserContext);
+  const [balance, setBalance] = React.useState(() => contextValue.user.balance);
 
-  // Each balance change:
-  // - updates the list of users and saves
-  // - yields updated user for Context
-  React.useEffect(() => {
-    const userList = loadAllUserData();
-    const theUser = userList.find((u) => u.id === ctx.user.id);
-    theUser.balance = balance;
-    ctx.user = theUser;
-    saveAllUserData(userList);
-  }, [balance]);
 
 
   const handleMoneyAccepted = ( amount ) => {
-    const newBalance = Math.round( (balance - Number(amount))*100 )/100;
-    setBalance( newBalance )
 
-    //alert with microtimeout, for apropiate on-screen result
-    setTimeout( () => alert( `A withdrawal of ${amount} has been processed. Your balance is: ${newBalance}`), 50 );
+    APIClient.withdraw( contextValue.token, amount, (err, response ) => {
+      if(err) console.log('ERR when withdrawing', err)
+      else {
+        console.log('Withdraw responded with:', response);
+        contextValue.user = response.body.user;
+        updateContextValue( contextValue );
+
+        const newBalance = contextValue.user.balance;
+        setBalance( newBalance );
+        setTimeout( () => alert( `A withdrawal of ${response.body.withdrawed} has been processed. Your balance is: ${newBalance}`), 50 );
+      }
+    });
+    
   }
 
 
   return (
     <Card
-      header={`${ctx.user.name}, withdraw:`}
+      header={`${contextValue.user.name}, withdraw:`}
       title={`Current balance: ${balance}`}
     >
       <CashierForm

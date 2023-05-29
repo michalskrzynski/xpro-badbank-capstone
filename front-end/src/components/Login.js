@@ -3,6 +3,7 @@ import { UserContext, UserContextProvider } from "./Context";
 
 import { Card } from "./Card";
 import * as APIClient from "../comms/APIClient";
+import decodeJwt from "../misc/decodeJwt";
 
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -22,12 +23,13 @@ export default function Login() {
     },
 
     onSubmit: (values) => {
-      APIClient.loginUser( values.email, values.password, (err, payload) => {
+      APIClient.loginUser( values.email, values.password, (err, token) => {
         if( err != null ) {
           setStatus( "Invalid login or password."); 
         }
         else {
-          updateContextValue( {user: payload.user, auth: payload.aws_auth});
+          const payload = decodeJwt(token);
+          updateContextValue( {token, user: payload.user, aws_auth: payload.aws_auth});
           window.location.href= '/#/welcome';
         }
       } );

@@ -1,5 +1,14 @@
 const {auth} = require('../impl/auth-impl');
 
+
+/**
+ * This controller performs a Login with Local strategy, ie. email and pasword
+ * The whole functionality is delegated to an already registered Passport Local
+ * Strategy, therefore calling it.
+ * @param {*} req 
+ * @param {*} res Containing {token, RefreshToken}
+ * @param {*} next 
+ */
 async function usersLogin(req, res, next) {
   
   auth.authenticate( 'local' , async(err, data, info) => {

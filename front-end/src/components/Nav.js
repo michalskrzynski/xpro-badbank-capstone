@@ -46,7 +46,7 @@ export default function Nav({pageHash, handlePageHashChange}) {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav mr-auto">
             
-            {contextValue && contextValue.auth ?
+            {contextValue && contextValue.aws_auth ?
               menuElements(true,pageHash, handlePageHashChange) :
               menuElements(false,pageHash, handlePageHashChange)
             }
