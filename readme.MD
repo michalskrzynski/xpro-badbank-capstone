@@ -18,6 +18,17 @@ To start the project:
 3. change the `example.env` file name to `.env` and edit it, filling all the environmental variables
 4. once all `.env` variables are set properly, run `npm start` 
 
+## Deployment:
+1. First copy the production env files from s3 to your local
+`s3 cp s3://bad-bank-env/badbank.env .env.production --profile=msk-personal`
+
+Please note you need to have a AWS credentials profile msk-profile to make it.
+If you don't have access to that profile, create file .env.production based
+on example.env filling all envs on your own.
+
+2. Ensure all envs are correct for you to connect to all assets.
+2. Run sh bin/env to export all envs to S3, they will be fetched during the deployment..
+
 ## Screenshots:
 
 To be published soon. Cross your fingers.

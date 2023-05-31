@@ -31,6 +31,7 @@ app.use(helmet());
 app.use(cors());
 app.use(compression());
 
+app.use('/', express.static('public'));
 app.use('/api/v1', apiRouter);
 app.use('/healthcheck', hcRouter);
 
