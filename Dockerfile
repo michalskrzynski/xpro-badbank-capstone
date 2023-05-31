@@ -19,7 +19,7 @@ COPY .eslintrc.js /app/.eslintrc.js
 RUN npm install
 # Copy app source code
 COPY server /app/server
-COPY front-end/build/. /app/public
+COPY front-end/build /app/public
 
 #Expose port and start application
 EXPOSE 3001
