@@ -15,15 +15,15 @@ WORKDIR /app
 COPY package.json /app/package.json
 COPY .babelrc /app/.babelrc
 COPY .eslintrc.js /app/.eslintrc.js
+COPY ecosystem.config.js /app/ecosystem.config.js
 # Step 3 - Install dependencies
 RUN npm install
-# Copy app source code
+# Copy app source code and build Backend
 COPY server /app/server
+RUN npm run build
+
 COPY front-end/build /app/public
 
 #Expose port and start application
 EXPOSE 3001
-CMD ["npm", "start"]
-
-
-#outside needs to be deployed with --platform=linux/amd64
+CMD ["npm", "run", "server"]
