@@ -1,12 +1,13 @@
 import request from 'superagent';
 
-const SERVER_URL = "https://www.michal-skrzynskifullstackbankingapplication.com";
-//const SERVER_URL = "http://localhost:3001";
+console.log("Value of env SERVER_URL:", process.env.REACT_APP_API_URL);
+
+
 const API_PATH = "/api/v1";
 
 
 function apiMethodUrl( methodName ) {
-  return SERVER_URL + API_PATH + methodName;
+  return process.env.REACT_APP_API_URL + API_PATH + methodName;
 }
 
 function saveRefreshToken( rt ) {

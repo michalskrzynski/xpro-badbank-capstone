@@ -8,8 +8,6 @@ import { Card } from "./Card";
 import CashierForm from "./CashierForm";
 
 
-import request from "superagent";
-
 // Includes a Bootstrap card with a form that has:
 // OK Deposit input field
 // OK Deposit button

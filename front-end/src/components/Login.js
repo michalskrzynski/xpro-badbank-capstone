@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from "react";
-import { UserContext, UserContextProvider } from "./Context";
+import React, {useState} from "react";
+import { UserContext } from "./Context";
 
 import { Card } from "./Card";
 import * as APIClient from "../comms/APIClient";

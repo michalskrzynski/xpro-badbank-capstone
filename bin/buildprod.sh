@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-echo "Checking out production!"
-git checkout production
-
 echo "Cleaning old builds"
 rm -rf front-end/build
 rm -rf public
