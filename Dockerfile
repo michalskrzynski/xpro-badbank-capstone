@@ -9,7 +9,10 @@ WORKDIR /app/front-end
 RUN npm install
 RUN npm run build
 
+# Step 3 - copy the frontend to app/public
 WORKDIR /app
+RUN mkdir public
+COPY front-end/build /app/public
 
 # Step 3 - Copy npm dependencies
 COPY package.json /app/package.json
@@ -21,8 +24,6 @@ RUN npm install
 # Copy app source code and build Backend
 COPY server /app/server
 RUN npm run build
-
-COPY front-end/build /app/public
 
 #Expose port and start application
 EXPOSE 3001

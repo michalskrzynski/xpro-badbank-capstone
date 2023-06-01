@@ -16,7 +16,7 @@ const app = express();
 
 // database setup
 const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
-const mongooseConfigs = { useNewUrlParser: true, useUnifiedTopology: true };
+const mongooseConfigs = { useNewUrlParser: true, useUnifiedTopology: true, ssl: Boolean(process.env.MONGO_SSL) };
 mongoose.connect(mongoUri, mongooseConfigs)
   .then(() => console.log('Connected to MongoDB'))
   .catch((error) => console.log('Error connecting to MongoDB:', error)); 

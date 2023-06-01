@@ -1,6 +1,6 @@
 import request from 'superagent';
 
-const SERVER_URL = "https://www.michal-skrzynskifullstackbankingapplication.com/";
+const SERVER_URL = "https://www.michal-skrzynskifullstackbankingapplication.com";
 //const SERVER_URL = "http://localhost:3001";
 const API_PATH = "/api/v1";
 
