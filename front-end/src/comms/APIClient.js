@@ -23,31 +23,44 @@ export function userHasBeenLoggedInBefore() {
 }
 
 
+export function allUsers() {
+  const methodName = '/users';
+
+  return new Promise( (resolve, reject ) => {
+    request.get( apiMethodUrl( methodName ) )
+      .end( ( err, response ) => {
+        if( err ) {
+          console.error( `API ${methodName} error: `, err);
+          reject(err)
+        }
+        else {
+          console.log( `API ${methodName} responded: `, response);
+          resolve( response )
+        }
+      })
+  });
+}
 
 
-export function createUser( user ) {
+
+export function createUser( user, cb ) {
   const methodName = '/users/create';
 
   return request.post( apiMethodUrl( methodName ))
     .send( user )
     .end( (err, response) => {
-      if( err ) {
-        console.error( `API ${methodName} error: `, err);
-      }
-      else {
-        console.log( `API ${methodName} responded: `, response);
-      }
+      if( err ) return cb(err, null);
+      if( response.body.message === "error" ) cb( response.body.error.code, null );
+      else cb( null, response )
     })
     
 }
 
 
-
-
 export function loginUser( email, password, doWithToken ) {
   const methodName = '/users/login';
   const data = {email, password};
-  console.log( "Sending through api: ", data);
+  console.log( "Sending through api: " +apiMethodUrl( methodName ), data);
 
   return request
     .post( apiMethodUrl( methodName ))
@@ -86,6 +99,15 @@ export function refreshUser( doWithToken ) {
         saveRefreshToken(response.body.RefreshToken);
       }
     });    
+}
+
+
+export function logout( token, cb ) {
+  const methodName = '/users/logout';
+  return request
+    .post( apiMethodUrl( methodName ) )
+    .set('Authorization', 'Bearer ' + token)
+    .end();
 }
 
 

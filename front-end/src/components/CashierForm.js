@@ -11,7 +11,7 @@ export default function CashierForm( {actionText, balance, amountValidationSchem
       amount: Math.min(1, balance),
     },
     onSubmit: (values) => {
-      handleMoneyAccepted(values.amount)
+      handleMoneyAccepted(values.amount*100)
       formik.handleReset();
     },
     validationSchema: Yup.object( {amount: amountValidationSchema} )}
@@ -31,7 +31,7 @@ export default function CashierForm( {actionText, balance, amountValidationSchem
     <form onSubmit={formik.handleSubmit}>
       <div className="form-group">
         <label htmlFor="name">Amount</label>
-        {formik.errors.amount && (
+        {formik.touched.amount && formik.errors.amount && (
           <div className="alert alert-danger py-1 px-3 mb-2" role="alert">
             <small>{formik.errors.amount}</small>
           </div>

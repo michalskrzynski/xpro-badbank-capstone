@@ -3,6 +3,7 @@ import { Card } from "./Card";
 import { Link } from "react-router-dom";
 
 import { UserContext } from "./Context";
+import { oneFormat } from "../misc/oneFormat";
 
 export default function Welcome() {
   const {contextValue, updateContextValue} = React.useContext(UserContext);
@@ -12,8 +13,8 @@ export default function Welcome() {
       header={`Welcome ${contextValue.user.name}!`}
       text={
         <div>
-          <p>You have been successfully logged in. </p>
-          <p>Your balance is <b>${contextValue.user.balance}</b></p>
+          <p>You are logged in. </p>
+          <p>Your balance is <b>${ oneFormat( contextValue.user.balance )}</b></p>
         </div>
       }
     >

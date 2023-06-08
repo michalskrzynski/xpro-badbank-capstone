@@ -6,6 +6,7 @@ import { UserContext } from "./Context";
 import * as APIClient from "../comms/APIClient";
 import { Card } from "./Card";
 import CashierForm from "./CashierForm";
+import { oneFormat } from "../misc/oneFormat";
 
 
 // Includes a Bootstrap card with a form that has:
@@ -34,9 +35,8 @@ export default function Deposit() {
         contextValue.user = response.body.user;
         updateContextValue( contextValue );
 
-        const newBalance = contextValue.user.balance;
-        setBalance( newBalance );
-        setTimeout( () => alert( `A deposit of ${response.body.deposited} has been successfully processed. Your balance is: ${newBalance}`), 50 );
+        setBalance( contextValue.user.balance );
+        setTimeout( () => alert( `A deposit of ${ oneFormat(response.body.deposited)} has been successfully processed. Your balance is: ${ oneFormat(contextValue.user.balance) }`), 50 );
       }
     });
   }
@@ -45,7 +45,7 @@ export default function Deposit() {
   return (
     <Card
       header={`${contextValue.user.name}, deposit:`}
-      title={`Current balance: ${balance}`}
+      title={`Current balance: ${oneFormat(balance)}`}
     >
       <CashierForm
         actionText="Deposit"

@@ -5,6 +5,7 @@ import { UserContext} from "./Context";
 import * as APIClient from "../comms/APIClient";
 import { Card } from "./Card";
 import CashierForm from "./CashierForm";
+import { oneFormat } from "../misc/oneFormat";
 
 // OK Includes a Bootstrap card with a form that has:
 // OK Withdraw input field 
@@ -35,9 +36,8 @@ export default function Withdraw() {
         contextValue.user = response.body.user;
         updateContextValue( contextValue );
 
-        const newBalance = contextValue.user.balance;
-        setBalance( newBalance );
-        setTimeout( () => alert( `A withdrawal of ${response.body.withdrawed} has been processed. Your balance is: ${newBalance}`), 50 );
+        setBalance( contextValue.user.balance );
+        setTimeout( () => alert( `A withdrawal of ${ oneFormat( response.body.withdrawed )} has been processed. Your balance is: ${ oneFormat( contextValue.user.balance ) }`), 50 );
       }
     });
     
@@ -47,7 +47,7 @@ export default function Withdraw() {
   return (
     <Card
       header={`${contextValue.user.name}, withdraw:`}
-      title={`Current balance: ${balance}`}
+      title={`Current balance: ${ oneFormat( balance ) }`}
     >
       <CashierForm
         actionText="Withdraw"
@@ -57,7 +57,7 @@ export default function Withdraw() {
           Yup.number()
           .required("This field is required")
           .min(0.01, "Amount needs to be greater than 0.")
-          .max(balance, "Withdrawal cannot be larger than your balance.")
+          .max(balance/100, "Withdrawal cannot be larger than your balance.")
         }
       ></CashierForm>
     </Card>

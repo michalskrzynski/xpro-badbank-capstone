@@ -6,17 +6,20 @@ import Home from "./Home";
 import Login from "./Login";
 import CreateAccount from "./CreateAccount";
 import AllData from "./AllData";
-//PRIVATE COMPONENTS
+//SECURE COMPONENTS
 import Welcome from "./Welcome";
 import Deposit from "./Deposit";
 import Withdraw from "./Withdraw";
 
-import { UserContextProvider, UserContext } from "./Context";
+import { UserContext } from "./Context";
 import * as APIClient from "../comms/APIClient";
 import decodeJwt from "../misc/decodeJwt";
+import { frontLogout } from "../misc/frontLogout";
 
 export default function App() {
   const {contextValue, updateContextValue} = React.useContext(UserContext);
+  const [userLoggedInBefore, setUserLoggedInBefore] = React.useState( APIClient.userHasBeenLoggedInBefore() )
+  
   console.log("Context User", contextValue );
   const [pageHash, setPageHash] = React.useState( 
     () => window.location.hash === "" ? "#/" : window.location.hash 
@@ -24,12 +27,15 @@ export default function App() {
 
 
   React.useEffect(() => {
-    if( APIClient.userHasBeenLoggedInBefore() ) {
+    if( userLoggedInBefore ) {
       console.log("User has been logged before, will try to login with RefreshToken");
       
       APIClient.refreshUser( (err, token) => {
         if( err != null ) {
-          alert('Login by Refresh failed.');
+          console.log('Login by Refresh failed, user/password login required.');
+          updateContextValue( frontLogout() );
+          setUserLoggedInBefore( false );
+          window.location.href= '/#/';
         }
         else {
           const payload = decodeJwt(token);
@@ -42,7 +48,10 @@ export default function App() {
 
 
   return (
-    <div id="content">
+    contextValue.user.name === null && userLoggedInBefore ? (
+      <p>Reinitiating session...</p>
+    ) : (
+      <div id="content">
       <HashRouter>
         <Nav pageHash={pageHash} handlePageHashChange={setPageHash} />
         <div id="mainblock" className="m-2">
@@ -66,6 +75,7 @@ export default function App() {
           MERN stack course. */}
         </div>
       </footer>
-    </div>
+      </div>
+    )
   );
 }

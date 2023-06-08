@@ -88,6 +88,20 @@ const jwtStrategy = new JwtStrategy(
 );
 
 
+const logoutStrategy = new JwtStrategy(
+  {
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: process.env.JWT_SECRET,
+  },
+  (payload, done) => {
+    cognitoAuth.globalSignOut({AccessToken: payload.aws_auth.AccessToken}, (err, data) => {
+      if( err ) return done(err);
+      return done(null, data);
+    })
+  }
+)
+
+
 
 async function verifyRefreshToken( rt/*, appendPayload*/ ) {
   const params = {
@@ -102,7 +116,7 @@ async function verifyRefreshToken( rt/*, appendPayload*/ ) {
     cognitoAuth.initiateAuth(params, (err, data) => {
       if( err ) {
         console.log( 'Refresh Token Authentication error: ', err);
-        reject( err )
+        return reject( err )
       }
 
       //there are 3 tokens coming from AWS
@@ -110,7 +124,7 @@ async function verifyRefreshToken( rt/*, appendPayload*/ ) {
       //but in the payload included in our token, we will only send 2
       const payload = { aws_auth: {AccessToken, IdToken}  };
 
-      resolve( payload );
+      return resolve( payload );
     });
   })
 }
@@ -124,4 +138,5 @@ function parseJwt (token) {
 
 passport.use( localStrategy ); 
 passport.use( jwtStrategy );
+passport.use( 'logout', logoutStrategy );
 module.exports = {auth: passport, verifyRefreshToken, parseJwt};

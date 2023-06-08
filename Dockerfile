@@ -19,6 +19,7 @@ COPY package.json /app/package.json
 COPY .babelrc /app/.babelrc
 COPY .eslintrc.js /app/.eslintrc.js
 COPY ecosystem.config.js /app/ecosystem.config.js
+COPY eu-west-1-bundle.pem /app/eu-west-1-bundle.pem
 # Step 3 - Install dependencies
 RUN npm install
 # Copy app source code and build Backend

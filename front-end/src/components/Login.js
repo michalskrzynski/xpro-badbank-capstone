@@ -50,7 +50,7 @@ export default function Login() {
       <form onSubmit={formik.handleSubmit}>
         {status ? (
           <div className="alert alert-danger py-1 px-3 mb-1" role="alert">
-            <small>Invalid username or password</small>
+            <small>Invalid username or password, or account not yet verified.</small>
           </div>
         ) : null}
         <div className="form-group">

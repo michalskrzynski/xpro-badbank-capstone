@@ -10,11 +10,14 @@ export default function Home() {
         <div className="d-flex mb-3">
           <img className="img-fluid" src="./img/scrooge.svg" width="30%" alt="bank-logo"/>
           <div>
-            We are bad and we are proud about it! All your money in one risky
-            place...
-            <br />
-            No authorization whatsoever! That's the way to live. Deposit money
-            and pray!
+            <p>Not so bad any more, <em>but still doing our best!</em></p>
+            <p>Due to the recent requirements from authorities, we've been obliged
+            to implement few security measures, like
+            </p>
+            <ul>
+              <li>Secure password storage and authentication (with Amazon Cognito).</li>
+              <li>Email verification with Amazon Cognito.</li>
+            </ul>
           </div>
         </div>
       }

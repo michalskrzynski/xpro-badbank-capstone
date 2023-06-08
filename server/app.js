@@ -11,13 +11,19 @@ const passport = require('passport');
 const bodyParser = require('body-parser');
 const apiRouter = require( './routes/apiV1' );
 const hcRouter = require( './routes/healthcheck' );
+const fs = require('fs');
+
+
 
 const app = express();
 
-// database setup
-const mongoUri = process.env.MONGODB_URI || process.env.MONGO_URI;
-const mongooseConfigs = { useNewUrlParser: true, useUnifiedTopology: true, ssl: Boolean(process.env.MONGO_SSL) };
-mongoose.connect(mongoUri, mongooseConfigs)
+
+const mongooseConfigs = { 
+  dbName: 'badbank',
+  useNewUrlParser: true, 
+  useUnifiedTopology: true
+};
+mongoose.connect(process.env.MONGO_URI, mongooseConfigs)
   .then(() => console.log('Connected to MongoDB'))
   .catch((error) => console.log('Error connecting to MongoDB:', error)); 
 

@@ -1,15 +1,11 @@
 import React from "react";
-import {
-  initUserDataOnCreate,
-  loadAllUserData,
-  saveAllUserData,
-} from "./Context";
+import { Link } from "react-router-dom";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+
 import { Card } from "./Card";
 import * as APIClient from "../comms/APIClient";
 
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { nanoid } from "nanoid";
 
 //Add validation to form fields
 
@@ -32,35 +28,35 @@ import { nanoid } from "nanoid";
 
 export default function CreateAccount() {
   const [success, setSuccess] = React.useState(false);
-  const [userList, setUserList] = React.useState(() => loadAllUserData());
-
-  //everytime userList changes, save it to LocalStorage
-  React.useEffect(() => saveAllUserData(userList), [userList]);
+  const [alert, setAlert] = React.useState(null);
+  const [createdUser, setCreatedUser] = React.useState( null );
 
   const formik = useFormik({
     initialValues: {
       name: "",
       email: "",
       password: "",
-      acceptNoSecurity: false,
+      acceptVerification: false,
     },
 
     onSubmit: (values) => {
       console.log(`Submit Pressed`);
 
       const user = { ...values };
-      APIClient.createUser( user )
-        .then( (result) => {
-          console.log('User successfully created:', result)
-          setSuccess(true);
-        })
-        .catch( (err) => {
-          console.log('User not created', err);
+      APIClient.createUser( user, (err, response) => {
+        if( err ) {
+          console.log('User not created other error', err);
+          setAlert("User with that email already exists.");
           setSuccess(false);
-        })
+        }
+        else {
+          console.log('User successfully created:', response);
+          setCreatedUser(response.body.data);
+          setSuccess(true);
+          setAlert(false);
+        } 
+      });
 
-      
-      //setUserList((prevNotes) => [user, ...userList]);
     },
 
     validationSchema: Yup.object({
@@ -75,9 +71,9 @@ export default function CreateAccount() {
         .required("Password is mandatory.")
         .min(8, "Password needs to have at least 8 characters.")
         .max(32, "Password can be only 32 characters long."),
-      acceptNoSecurity: Yup.bool().oneOf(
+      acceptVerification: Yup.bool().oneOf(
         [true],
-        "You must accept the 'no security policy'"
+        "You need to confirm the requirement to click the verification link you will receive."
       ),
     }),
   });
@@ -97,6 +93,11 @@ export default function CreateAccount() {
 
   return (
     <Card header="Create New Account">
+      {alert && (
+      <div className="alert alert-danger py-1 px-3 mb-1" role="alert">
+        <small>{alert}</small>
+      </div>
+      )}
       {!success ? (
         <form onSubmit={formik.handleSubmit}>
           <div className="form-group">
@@ -153,25 +154,23 @@ export default function CreateAccount() {
           </div>
 
           <div className="form-group mt-2">
-            {formik.touched.acceptNoSecurity &&
-              formik.errors.acceptNoSecurity && (
+            {formik.touched.acceptVerification &&
+              formik.errors.acceptVerification && (
                 <div className="alert alert-danger py-1 px-3 mb-1" role="alert">
-                  <small>{formik.errors.acceptNoSecurity}</small>
+                  <small>{formik.errors.acceptVerification}</small>
                 </div>
               )}
             <div className="form-check">
               <input
                 className="form-check-input"
                 type="checkbox"
-                id="acceptNoSecurity"
-                value={formik.values.acceptNoSecurity}
+                id="acceptVerification"
+                value={formik.values.acceptVerification}
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
               />
-              <label className="form-check-label" htmlFor="acceptNoSecurity">
-                I consent to 'no{" "}
-                <a href="http://here-is-security-404.org">security</a> at all'
-                policy.
+              <label className="form-check-label" htmlFor="acceptVerification">
+                I uderstand there will be a verification link sent to me via email, that I have to click.
               </label>
             </div>
           </div>
@@ -191,19 +190,25 @@ export default function CreateAccount() {
           <Card bgcolor="success" txtcolor="light" header="Success" title="New Account Created">
             <hr />
             <div>
-              Name: {formik.values.name} <br />
-              Email: {formik.values.email} <br />
-              Name: {formik.values.password}
+              Name: {createdUser.name} <br />
+              Email: {createdUser.email} <br />
+              Account #: {createdUser.account_number} <br />
+              Please check your email for verification link.
             </div>
           </Card>
-          <div className="d-flex justify-content-end">
+          
+          <div className="d-grid gap-2 d-sm-flex justify-content-sm-center">
             <button
               type="submit"
-              className="btn btn-primary mt-3"
+              className="btn btn-outline-secondary"
               onClick={handleAnotherAccount}
             >
               Add Another Account
             </button>
+            <Link to="/login/" className="btn btn-primary px-4">
+
+                Login
+            </Link>
           </div>
         </>
       )}
