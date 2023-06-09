@@ -11,6 +11,8 @@ const passport = require('passport');
 const bodyParser = require('body-parser');
 const apiRouter = require( './routes/apiV1' );
 const hcRouter = require( './routes/healthcheck' );
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swagger');
 const fs = require('fs');
 
 
@@ -37,6 +39,7 @@ app.use(helmet());
 app.use(cors());
 app.use(compression());
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/', express.static('public'));
 app.use('/api/v1', apiRouter);
 app.use('/healthcheck', hcRouter);

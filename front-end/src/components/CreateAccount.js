@@ -6,7 +6,6 @@ import * as Yup from "yup";
 import { Card } from "./Card";
 import * as APIClient from "../comms/APIClient";
 
-
 //Add validation to form fields
 
 // Includes a Bootstrap card with a form that has:
@@ -29,7 +28,7 @@ import * as APIClient from "../comms/APIClient";
 export default function CreateAccount() {
   const [success, setSuccess] = React.useState(false);
   const [alert, setAlert] = React.useState(null);
-  const [createdUser, setCreatedUser] = React.useState( null );
+  const [createdUser, setCreatedUser] = React.useState(null);
 
   const formik = useFormik({
     initialValues: {
@@ -43,20 +42,18 @@ export default function CreateAccount() {
       console.log(`Submit Pressed`);
 
       const user = { ...values };
-      APIClient.createUser( user, (err, response) => {
-        if( err ) {
-          console.log('User not created other error', err);
+      APIClient.createUser(user, (err, response) => {
+        if (err) {
+          console.log("User not created other error", err);
           setAlert("User with that email already exists.");
           setSuccess(false);
-        }
-        else {
-          console.log('User successfully created:', response);
+        } else {
+          console.log("User successfully created:", response);
           setCreatedUser(response.body.data);
           setSuccess(true);
           setAlert(false);
-        } 
+        }
       });
-
     },
 
     validationSchema: Yup.object({
@@ -94,9 +91,9 @@ export default function CreateAccount() {
   return (
     <Card header="Create New Account">
       {alert && (
-      <div className="alert alert-danger py-1 px-3 mb-1" role="alert">
-        <small>{alert}</small>
-      </div>
+        <div className="alert alert-danger py-1 px-3 mb-1" role="alert">
+          <small>{alert}</small>
+        </div>
       )}
       {!success ? (
         <form onSubmit={formik.handleSubmit}>
@@ -170,24 +167,34 @@ export default function CreateAccount() {
                 onChange={formik.handleChange}
               />
               <label className="form-check-label" htmlFor="acceptVerification">
-                I uderstand there will be a verification link sent to me via email, that I have to click.
+                I uderstand there will be a verification link sent to me via
+                email, that I have to click.
               </label>
             </div>
           </div>
 
-          <div className="d-flex justify-content-end">  
+          <div className="d-flex justify-content-end">
             <button
               type="submit"
               className="btn btn-primary mt-4"
-              disabled={!(Object.keys(formik.errors).length === 0) && "disabled"}
+              disabled={
+                !(Object.keys(formik.errors).length === 0) && "disabled"
+              }
             >
               Create Account
             </button>
           </div>
         </form>
+
       ) : (
+        
         <>
-          <Card bgcolor="success" txtcolor="light" header="Success" title="New Account Created">
+          <Card
+            bgcolor="success"
+            txtcolor="light"
+            header="Success"
+            title="New Account Created"
+          >
             <hr />
             <div>
               Name: {createdUser.name} <br />
@@ -196,7 +203,7 @@ export default function CreateAccount() {
               Please check your email for verification link.
             </div>
           </Card>
-          
+
           <div className="d-grid gap-2 d-sm-flex justify-content-sm-center">
             <button
               type="submit"
@@ -206,8 +213,7 @@ export default function CreateAccount() {
               Add Another Account
             </button>
             <Link to="/login/" className="btn btn-primary px-4">
-
-                Login
+              Login
             </Link>
           </div>
         </>
