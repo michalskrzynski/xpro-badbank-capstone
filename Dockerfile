@@ -1,4 +1,4 @@
-FROM node:16.0.0-slim
+FROM node:19.0.0-slim
 
 # Step 1 - Add container working directory
 WORKDIR /app/front-end
