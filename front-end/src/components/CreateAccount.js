@@ -1,10 +1,11 @@
-import React from "react";
+import React, {useContext} from "react";
 import { Link } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
 import { Card } from "./Card";
 import * as APIClient from "../comms/APIClient";
+import {ConnectionMonitorContext} from "./ConnectionMonitor";
 
 //Add validation to form fields
 
@@ -26,9 +27,10 @@ import * as APIClient from "../comms/APIClient";
 // OK Cleared Create Account Form: Upon selecting the create account button, t will open a cleared create account form.
 
 export default function CreateAccount() {
-  const [success, setSuccess] = React.useState(false);
-  const [alert, setAlert] = React.useState(null);
-  const [createdUser, setCreatedUser] = React.useState(null);
+  const {state, setApiPromise } = useContext(ConnectionMonitorContext);
+  const [success, setSuccess] = React.useState(false); //user has been successfully created
+  const [alert, setAlert] = React.useState(null); //alert is to be displayed on screen
+
 
   const formik = useFormik({
     initialValues: {
@@ -42,18 +44,28 @@ export default function CreateAccount() {
       console.log(`Submit Pressed`);
 
       const user = { ...values };
-      APIClient.createUser(user, (err, response) => {
-        if (err) {
+
+      const promise = APIClient.createUser( user )
+        .then( response => {
+          if( response.body.message === "error" ) {
+            setAlert("User with that email already exists.");
+            setSuccess(false);
+          }
+          else {
+            console.log("User successfully created:", response);
+            setSuccess(true);
+            setAlert(false);
+          }
+          return response;
+        })
+        .catch( err => {
           console.log("User not created other error", err);
-          setAlert("User with that email already exists.");
+          setAlert("User not created for other error, please contact Administrator.");
           setSuccess(false);
-        } else {
-          console.log("User successfully created:", response);
-          setCreatedUser(response.body.data);
-          setSuccess(true);
-          setAlert(false);
-        }
+          return err;
       });
+
+      setApiPromise( promise );
     },
 
     validationSchema: Yup.object({
@@ -178,16 +190,16 @@ export default function CreateAccount() {
               type="submit"
               className="btn btn-primary mt-4"
               disabled={
-                !(Object.keys(formik.errors).length === 0) && "disabled"
+                (!(Object.keys(formik.errors).length === 0) || state.loading) && "disabled" 
               }
             >
-              Create Account
+              {state.loading ? "Loading..." : "Create Account"}
             </button>
           </div>
         </form>
 
       ) : (
-        
+
         <>
           <Card
             bgcolor="success"
@@ -197,9 +209,9 @@ export default function CreateAccount() {
           >
             <hr />
             <div>
-              Name: {createdUser.name} <br />
-              Email: {createdUser.email} <br />
-              Account #: {createdUser.account_number} <br />
+              Name: {state.data.body.data.name} <br />
+              Email: {state.data.body.data.email} <br />
+              Account #: {state.data.body.data.account_number} <br />
               Please check your email for verification link.
             </div>
           </Card>

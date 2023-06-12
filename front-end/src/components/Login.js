@@ -8,6 +8,8 @@ import decodeJwt from "../misc/decodeJwt";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
+import { saveRefreshToken } from "../misc/tokenStorage";
+
 
 export default function Login() {
   const {contextValue, updateContextValue} = React.useContext(UserContext);
@@ -23,16 +25,20 @@ export default function Login() {
     },
 
     onSubmit: (values) => {
-      APIClient.loginUser( values.email, values.password, (err, token) => {
-        if( err != null ) {
-          setStatus( "Invalid login or password."); 
-        }
-        else {
-          const payload = decodeJwt(token);
-          updateContextValue( {token, user: payload.user, aws_auth: payload.aws_auth});
+      APIClient.loginUser( values.email, values.password ) 
+        .then( response => {
+          const token = response.body.token;
+          console.log("Logged in, response: ", response);
+          const payload = decodeJwt( token );
+
           window.location.href= '/#/welcome';
-        }
-      } );
+          updateContextValue( {token, user: payload.user, aws_auth: payload.aws_auth});
+ 
+          saveRefreshToken(response.body.RefreshToken);
+        })
+        .catch( err => {
+          setStatus( "Invalid login or password."); 
+        } );
     },
 
     validationSchema: Yup.object({

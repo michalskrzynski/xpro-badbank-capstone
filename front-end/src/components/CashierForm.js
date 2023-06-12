@@ -1,10 +1,13 @@
-import React from "react";
+import React, {useContext}  from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup"
 
+import {ConnectionMonitorContext} from "./ConnectionMonitor";
 
 
 export default function CashierForm( {actionText, balance, amountValidationSchema, handleMoneyAccepted} ) {
+  const {state, setApiPromise } = useContext(ConnectionMonitorContext);
+  console.log( "Cashier state: ", state);
 
   const formik = useFormik({
     initialValues: {
@@ -46,8 +49,8 @@ export default function CashierForm( {actionText, balance, amountValidationSchem
       </div>
 
       <div className="d-flex justify-content-end">
-        <button type="submit" className="btn btn-primary mt-4" disabled={formik.errors.amount && 'disabled'} >
-          {actionText}
+        <button type="submit" className="btn btn-primary mt-4" disabled={(formik.errors.amount || state.loading) && 'disabled'} >
+          {state.loading ? "Loading..." : actionText}
         </button>
       </div>
     </form>

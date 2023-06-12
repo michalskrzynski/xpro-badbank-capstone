@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 echo "Cleaning old builds"
 rm -rf front-end/build
 rm -rf public

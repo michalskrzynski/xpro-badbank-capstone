@@ -29,17 +29,17 @@ export default function Withdraw() {
 
   const handleMoneyAccepted = ( amount ) => {
 
-    APIClient.withdraw( contextValue.token, amount, (err, response ) => {
-      if(err) console.log('ERR when withdrawing', err)
-      else {
-        console.log('Withdraw responded with:', response);
+    APIClient.withdraw( contextValue.token, amount)
+      .then( response => {
+        console.log('Deposit responded with:', response);
         contextValue.user = response.body.user;
         updateContextValue( contextValue );
 
         setBalance( contextValue.user.balance );
         setTimeout( () => alert( `A withdrawal of ${ oneFormat( response.body.withdrawed )} has been processed. Your balance is: ${ oneFormat( contextValue.user.balance ) }`), 50 );
-      }
-    });
+      })
+      .catch( err => console.log('ERR when withdrawing', err) ); 
+
     
   }
 

@@ -1,5 +1,4 @@
-import React from "react";
-import { useState } from "react";
+import React, {useContext, useState} from "react";
 import * as Yup from "yup";
 
 import { UserContext } from "./Context";
@@ -7,6 +6,8 @@ import * as APIClient from "../comms/APIClient";
 import { Card } from "./Card";
 import CashierForm from "./CashierForm";
 import { oneFormat } from "../misc/oneFormat";
+
+import {ConnectionMonitorContext} from "./ConnectionMonitor";
 
 
 // Includes a Bootstrap card with a form that has:
@@ -23,23 +24,28 @@ import { oneFormat } from "../misc/oneFormat";
 
 
 export default function Deposit() {
-  const {contextValue, updateContextValue} = React.useContext(UserContext);
+  const {state, setApiPromise } = useContext(ConnectionMonitorContext);
+  const {contextValue, updateContextValue} = useContext(UserContext);
   const [balance, setBalance] = useState(() => contextValue.user.balance);
 
   const handleMoneyAccepted = ( amount ) => {
+    console.log('Handle money accepted');
 
-    APIClient.deposit( contextValue.token, amount, (err, response ) => {
-      if(err) console.log('ERR when depositing', err)
-      else {
+    const promise = APIClient.deposit( contextValue.token, amount )
+      .then( response => {
         console.log('Deposit responded with:', response);
-        contextValue.user = response.body.user;
-        updateContextValue( contextValue );
+        updateContextValue( {...contextValue, user: response.body.user} );
 
-        setBalance( contextValue.user.balance );
-        setTimeout( () => alert( `A deposit of ${ oneFormat(response.body.deposited)} has been successfully processed. Your balance is: ${ oneFormat(contextValue.user.balance) }`), 50 );
-      }
-    });
-  }
+        setBalance( response.body.user.balance );
+        setTimeout( () => alert( `A deposit of ${ oneFormat(response.body.deposited)} has been successfully processed. Your balance is: ${ oneFormat(response.body.user.balance) }`), 50 );
+        return response;
+      })
+      .catch( err => {console.log('ERR when depositing', err); return err} ); 
+  
+    setApiPromise( promise );
+  };
+
+
 
 
   return (

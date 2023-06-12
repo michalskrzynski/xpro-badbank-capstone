@@ -1,6 +1,19 @@
 import React from "react";
 import { Routes, Route, Link, HashRouter } from "react-router-dom";
 
+
+import { UserContext } from "./Context";
+import * as APIClient from "../comms/APIClient";
+import decodeJwt from "../misc/decodeJwt";
+import { frontLogout } from "../misc/frontLogout";
+import { getRefreshToken, saveRefreshToken } from "../misc/tokenStorage";
+
+
+
+import ConnectionMonitor from "./ConnectionMonitor";
+//
+//  SCREEENS
+//
 import Nav from "./Nav"
 import Home from "./Home";
 import Login from "./Login";
@@ -11,10 +24,10 @@ import Welcome from "./Welcome";
 import Deposit from "./Deposit";
 import Withdraw from "./Withdraw";
 
-import { UserContext } from "./Context";
-import * as APIClient from "../comms/APIClient";
-import decodeJwt from "../misc/decodeJwt";
-import { frontLogout } from "../misc/frontLogout";
+
+
+
+
 
 export default function App() {
   const {contextValue, updateContextValue} = React.useContext(UserContext);
@@ -30,19 +43,24 @@ export default function App() {
     if( userLoggedInBefore ) {
       console.log("User has been logged before, will try to login with RefreshToken");
       
-      APIClient.refreshUser( (err, token) => {
-        if( err != null ) {
-          console.log('Login by Refresh failed, user/password login required.');
+      APIClient.refreshUser()
+        .then( response => {
+          console.log("Refresh Login Successful!");
+          const token = response.body.token;
+          const payload = decodeJwt( token );
+          
+          updateContextValue( {token, user: payload.user, aws_auth: payload.aws_auth});
+          window.location.href= '/#/welcome';
+
+          saveRefreshToken(response.body.RefreshToken);
+          //saveAccessToken( token );
+        })
+        .catch( err => {
+          console.log('Login by Refresh failed, user/password login required.', err);
           updateContextValue( frontLogout() );
           setUserLoggedInBefore( false );
           window.location.href= '/#/';
-        }
-        else {
-          const payload = decodeJwt(token);
-          updateContextValue( {token, user: payload.user, aws_auth: payload.aws_auth});
-          window.location.href= '/#/welcome';
-        }
-      } );
+        });
     }
   }, []);
 
@@ -52,6 +70,7 @@ export default function App() {
       <p>Reinitiating session...</p>
     ) : (
       <div id="content">
+      <ConnectionMonitor>
       <HashRouter>
         <Nav pageHash={pageHash} handlePageHashChange={setPageHash} />
         <div id="mainblock" className="m-2">
@@ -66,6 +85,7 @@ export default function App() {
             </Routes>
         </div>
       </HashRouter>
+      </ConnectionMonitor>
       <hr />
       <footer>
         <div className="p-2">

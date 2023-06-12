@@ -35,14 +35,12 @@ export default function Nav({ pageHash, handlePageHashChange }) {
 
   const logout = function () {
     console.log("Trying to log out, token: ", contextValue.token);
-    APIClient.logout( contextValue.token, (err, done) => {
-      if(err) console.log(err)
-      else console.log(done); 
-    });
+    APIClient.logout( contextValue.token )
+      .then( response => console.log('Logout outcome: ', response ) )
+      .catch( err => console.log(err) );
 
     updateContextValue( frontLogout() );
-    document.location.href = "#/";
-    window.location.reload();
+    setTimeout( () => {document.location.href = "#/"; window.location.reload();}, 50);
   }
 
   return (
