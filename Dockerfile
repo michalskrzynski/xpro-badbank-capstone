@@ -12,7 +12,9 @@ RUN npm run build
 # Step 3 - copy the frontend to app/public
 WORKDIR /app
 RUN mkdir public
+WORKDIR /app/frontend
 RUN ls -a
+WORKDIR /app
 COPY front-end/build /app/public
 
 # Step 3 - Copy npm dependencies
