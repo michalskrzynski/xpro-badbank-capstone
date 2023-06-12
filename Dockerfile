@@ -6,6 +6,7 @@ WORKDIR /app/front-end
 # Step 2 - copy and compile front-end
 COPY front-end /app/front-end/
 WORKDIR /app/front-end
+RUN npm install
 RUN npm ci
 RUN npm run build
 
@@ -21,6 +22,7 @@ COPY .eslintrc.js /app/.eslintrc.js
 COPY ecosystem.config.js /app/ecosystem.config.js
 COPY eu-west-1-bundle.pem /app/eu-west-1-bundle.pem
 # Step 3 - Install dependencies
+RUN npm install
 RUN npm ci
 # Copy app source code and build Backend
 COPY server /app/server
