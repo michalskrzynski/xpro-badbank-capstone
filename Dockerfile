@@ -1,14 +1,15 @@
 FROM node:19.7.0-slim
 
-# Step 1 - Add container working directory
-WORKDIR /app/front-end
-
-# Step 2 - copy and compile front-end
 COPY front-end /app/front-end/
 WORKDIR /app/front-end
+
 RUN npm install
 RUN npm ci
 RUN npm run build
+
+RUN ls -a 
+WORKDIR /app
+RUN ls -a
 
 # Step 3 - copy the frontend to app/public
 WORKDIR /app
