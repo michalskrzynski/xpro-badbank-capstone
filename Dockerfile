@@ -5,15 +5,12 @@ WORKDIR /app/front-end
 
 RUN npm install
 RUN npm ci
-RUN npm run build
+RUN npm run build 
 RUN ls -a 
 
+# Step 3 - symlink to the built frontend
 WORKDIR /app
-# Step 3 - copy the frontend to app/public
-WORKDIR /app
-RUN mkdir public
-RUN ls -a
-COPY /app/front-end/build /app/public
+RUN ln -s /app/front-end/build /app/public
 
 # Step 3 - Copy npm dependencies
 COPY package.json /app/package.json
