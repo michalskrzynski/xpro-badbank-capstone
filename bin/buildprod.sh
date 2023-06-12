@@ -13,7 +13,7 @@ cp -r front-end/build public
 npm run build
 
 echo "Building docker image"
-docker build -t bad-bank:latest .
+docker build -t bad-bank:latest --platform=x86_64 .
 docker tag bad-bank:latest 798614671151.dkr.ecr.eu-west-1.amazonaws.com/bad-bank:latest
 
 echo "Pushing image to ECR"
