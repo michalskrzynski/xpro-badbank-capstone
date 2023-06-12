@@ -38,7 +38,6 @@
     "express": "~4.16.1",
     "helmet": "^3.22.0",
     "jsonwebtoken": "^9.0.0",
-    "moment": "^2.29.4",
     "mongodb": "^3.7.3",
     "mongoose": "^5.3.16",
     "morgan": "^1.9.1",
