@@ -4,7 +4,7 @@ FROM node:19.7.0-slim
 WORKDIR /app/front-end
 
 # Step 2 - copy and compile front-end
-COPY front-end /app/front-end
+COPY front-end /app/front-end/
 WORKDIR /app/front-end
 RUN npm install
 RUN npm run build
@@ -12,9 +12,6 @@ RUN npm run build
 # Step 3 - copy the frontend to app/public
 WORKDIR /app
 RUN mkdir public
-WORKDIR /app/frontend
-RUN ls -a
-WORKDIR /app
 COPY front-end/build /app/public
 
 # Step 3 - Copy npm dependencies

@@ -1,6 +1,6 @@
 import request from 'superagent';
 
-import {getRefreshToken, saveRefreshToken} from "../misc/tokenStorage";
+import { getRefreshToken, saveRefreshToken } from "../misc/tokenStorage";
 
 console.log("Value of env SERVER_URL:", process.env.REACT_APP_API_URL);
 
