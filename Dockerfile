@@ -16,7 +16,6 @@ RUN ln -s /app/front-end/build /app/public
 COPY package.json /app/package.json
 COPY .babelrc /app/.babelrc
 COPY .eslintrc.js /app/.eslintrc.js
-COPY ecosystem.config.js /app/ecosystem.config.js
 # Step 3 - Install dependencies
 RUN npm install
 RUN npm ci
