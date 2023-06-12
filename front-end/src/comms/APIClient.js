@@ -67,7 +67,7 @@ export const API_METHODS = {
 
 
 function genericCall( descriptor ) {
-  const url = process.env.REACT_APP_API_URL + API_PATH + descriptor.path;
+  const url = SERVER_URL + API_PATH + descriptor.path;
   const data = descriptor.params;
   console.log( "Sending through api: " + url, data);
 
