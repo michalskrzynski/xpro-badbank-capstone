@@ -3,7 +3,7 @@ import request from 'superagent';
 import { getRefreshToken, saveRefreshToken } from "../misc/tokenStorage";
 
 
-const SERVER_URL = process.env.REACT_APP_API_URL || "https://www.michal-skrzynskifullstackbankingapplication.com/";
+const SERVER_URL = process.env.REACT_APP_API_URL || "https://www.michal-skrzynskifullstackbankingapplication.com";
 console.log("Value of env SERVER_URL:", process.env.REACT_APP_API_URL);
 const API_PATH = "/api/v1";
 
