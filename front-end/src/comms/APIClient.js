@@ -62,6 +62,15 @@ export const API_METHODS = {
     params: {
       amount: null
     }
+  },
+  WIRE_TRANSFER: {
+    path: '/users/wire-transfer',
+    bearer: null,
+    params: {
+      receiver: null,
+      receiverAccount: null,
+      amount: null
+    }
   }
 }
 
@@ -76,7 +85,7 @@ function genericCall( descriptor ) {
 
   if( checkNullFields(descriptor.params) ) {
     console.error('AllMandatoryFieldsNotSetError returning empty promise...');
-    return new Promise( (resolve, reject) => {resolve();} );
+    throw new Error("AllMandatoryFieldsNotSetError");
   }
   return req.send( data );
 }
@@ -145,6 +154,18 @@ export function withdraw( bearer, amount ) {
   const descriptor = API_METHODS.WITHDRAW;
   descriptor.bearer = bearer;
   descriptor.params.amount = amount;
+
+  return genericCall( descriptor );
+}
+
+
+export function wireTransfer( bearer, amount, receiver, receiverAccount, description ) {
+  const descriptor = API_METHODS.WIRE_TRANSFER;
+  descriptor.bearer = bearer;
+  descriptor.params.amount = amount;
+  descriptor.params.receiver = receiver;
+  descriptor.params.receiverAccount = receiverAccount;
+  descriptor.params.description = description
 
   return genericCall( descriptor );
 }

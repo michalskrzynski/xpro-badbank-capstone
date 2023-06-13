@@ -24,12 +24,28 @@ const transactionSchema = new mongoose.Schema( {
     ],
     required: true,
   },
-  fromToAccount: {
+  toFromId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false
+  },
+  toFromText: {
     type: String,
-    required: false,
-    maxLength: 20
+    required: false
+  },
+  description: {
+    type: String,
+    required: false
+  },
+  balanceBefore: {
+    type: Number,
+    required: true
   },
   amount: {
+    type: Number,
+    required: true
+  },
+  balanceAfter: {
     type: Number,
     required: true
   },
@@ -42,4 +58,4 @@ const transactionSchema = new mongoose.Schema( {
 
 const Transaction = mongoose.model('Transaction', transactionSchema);
 
-module.exports = Transaction;
+module.exports = {Transaction, transTypes};

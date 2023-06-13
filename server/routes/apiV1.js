@@ -9,6 +9,7 @@ const usersRefresh = require('../controllers/users-refresh');
 const usersLogout = require('../controllers/users-logout');
 const usersDeposit = require('../controllers/users-deposit');
 const usersWithdraw = require('../controllers/users-withdraw');
+const usersWireTransfer = require('../controllers/users-wire-transfer');
 
 
 
@@ -110,6 +111,7 @@ router.post('/users/create', usersCreate);
 router.post('/users/logout', authenticate, usersLogout );
 router.post('/users/deposit', authenticate, amountParam, usersDeposit );
 router.post('/users/withdraw', authenticate, amountParam, usersWithdraw );
+router.post('/users/wire-transfer', authenticate, amountParam, usersWireTransfer );
 
 
 module.exports = router;

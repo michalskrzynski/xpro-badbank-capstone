@@ -1,5 +1,7 @@
 import User from "../models/User";
 const { ObjectId } = require('mongodb');
+const transactionDal = require("../dal/transaction-dal");
+const { transTypes } = require("../models/Transaction");
 
 
 /**
@@ -35,14 +37,33 @@ async function create( userData ) {
 
 
 /**
- * Atomically finds a user and deposits amount on its account using increment.
+ * Atomically finds a user and credits amount on its account using increment.
  * @param {String} userId 
  * @param {Number} amount 
  * @returns Promise with a new user
  */
-async function deposit( userId, amount ) {
+async function credit( userId, amount, tData ) {
+  let updatedUser = null;
+
   if( amount < 0 ) throw new Error("DepositAmountNegative");
-  return User.findByIdAndUpdate( userId, { $inc: {balance: amount}}, {new: true} );
+  return User.findByIdAndUpdate( userId, { $inc: {balance: amount}}, {new: true} )
+    .then( user => { 
+      
+      updatedUser = user;
+      tData = tData || {
+        userId,
+        amount,
+        transType: transTypes.DEPOSIT
+      }
+      tData.balanceBefore = updatedUser.balance - amount;
+      tData.balanceAfter = updatedUser.balance;
+      
+      return transactionDal.create( tData );
+    })
+    .then( transaction => {
+      updatedUser.lastTransaction = transaction;
+      return updatedUser;
+    })
 }
 
 
@@ -53,12 +74,31 @@ async function deposit( userId, amount ) {
  * @param {Number} amount 
  * @returns 
  */
-async function withdraw( userId, amount ) {
+async function debit( userId, amount, tData ) {
+  let updatedUser = null;
+
   return User.findOneAndUpdate( 
     { _id: ObjectId(userId), balance: { $gte: amount } }, 
     { $inc: { balance: -amount } },
     { new: true }
-  )
+    
+    ).then( user => {
+      debugger;
+      updatedUser = user;
+      tData = tData || {
+        userId,
+        amount,
+        transType: transTypes.WITHDRAWAL
+      }
+      tData.balanceBefore = updatedUser.balance + amount;
+      tData.balanceAfter = updatedUser.balance;
+      
+      return transactionDal.create( tData );
+    })
+    .then( transaction => {
+      updatedUser.lastTransaction = transaction;
+      return updatedUser;
+    })
 }
 
-module.exports = {find, all, create, deposit, withdraw}
+module.exports = {find, all, create, credit, debit}

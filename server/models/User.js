@@ -9,6 +9,15 @@ const UserSchema = new Schema( {
   created_at: {type: Date, default: Date.now}
 });
 
+UserSchema.virtual('lastTransaction')
+  .get( function() {
+    return this._lastTransaction
+  })
+  .set( function(lastTrans) {
+    this._lastTransaction = lastTrans;
+});
+
+
 const User = model('User', UserSchema);
 
 module.exports = User;

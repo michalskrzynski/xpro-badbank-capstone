@@ -12,6 +12,7 @@ const menuOptions = [
   { hash: "#/welcome", secure: true, desc: "Welcome" },
   { hash: "#/deposit/", secure: true, desc: "Deposit" },
   { hash: "#/withdraw/", secure: true, desc: "Withdraw" },
+  { hash: "#/wire-transfer/", secure: true, desc: "Wire Transfer" },
   { hash: "#/all-data/", desc: "All Data" },
 ];
 

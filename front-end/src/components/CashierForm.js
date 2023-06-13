@@ -45,6 +45,7 @@ export default function CashierForm( {actionText, balance, amountValidationSchem
           className="form-control"
           value={formik.values.amount}
           onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
         />
       </div>
 

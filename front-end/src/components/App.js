@@ -23,6 +23,7 @@ import AllData from "./AllData";
 import Welcome from "./Welcome";
 import Deposit from "./Deposit";
 import Withdraw from "./Withdraw";
+import WireTransfer from "./WireTransfer";
 
 
 
@@ -81,6 +82,7 @@ export default function App() {
               <Route path="/welcome/" element={<Welcome />} />
               <Route path="/deposit/" element={<Deposit />} />
               <Route path="/withdraw/" element={<Withdraw />} />
+              <Route path="/wire-transfer/" element={<WireTransfer />} />
               <Route path="/all-data/" element={<AllData />} />
             </Routes>
         </div>
