@@ -55,7 +55,7 @@ export default function ConnectionMonitor( {children} ) {
   }
 
   return (
-    <ConnectionMonitorContext.Provider value={ {state, setApiPromise, dispatch} }>
+    <ConnectionMonitorContext.Provider value={ {state, setApiPromise} }>
       {children}
     </ConnectionMonitorContext.Provider>
   )

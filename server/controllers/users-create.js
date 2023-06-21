@@ -10,10 +10,13 @@ async function usersCreate(req, res, next) {
 
   cognitoCreateUser( email, password )
     .then( (cogResult) => userDal.create( {name, email, account_number, userSub: cogResult.userSub} ))
-    .then( (result) => res.status(201).json({ message: "ok", data: result }) )
+    .then( (result) => res.status(200).json({ message: "ok", user: result }) )
     .catch( (err) => {
       console.log( "Error: ", err );
-      res.status(200).send( { message: "error", code: err.code, error:err } );
+      if( err.code === "UsernameExistsException" )
+        res.status(200).send( { message: "error", code: err.code, error:err } );
+      else 
+        res.sendStatus(500);
     });
 
 }

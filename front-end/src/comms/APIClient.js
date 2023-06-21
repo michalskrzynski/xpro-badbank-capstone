@@ -50,27 +50,31 @@ export const API_METHODS = {
     bearer: null
   },
   DEPOSIT: {
-    path: '/users/deposit',
+    path: '/transactions/deposit',
     bearer: null,
     params: {
       amount: null
     }
   },
   WITHDRAW: {
-    path: '/users/withdraw',
+    path: '/transactions/withdraw',
     bearer: null,
     params: {
       amount: null
     }
   },
   WIRE_TRANSFER: {
-    path: '/users/wire-transfer',
+    path: '/transactions/wire-transfer',
     bearer: null,
     params: {
       receiver: null,
       receiverAccount: null,
       amount: null
     }
+  },
+  TRANSACTIONS: {
+    path: '/transactions',
+    bearer: null,
   }
 }
 
@@ -166,6 +170,13 @@ export function wireTransfer( bearer, amount, receiver, receiverAccount, descrip
   descriptor.params.receiver = receiver;
   descriptor.params.receiverAccount = receiverAccount;
   descriptor.params.description = description
+
+  return genericCall( descriptor );
+}
+
+export function transactions( bearer ) {
+  const descriptor = API_METHODS.TRANSACTIONS;
+  descriptor.bearer = bearer;
 
   return genericCall( descriptor );
 }

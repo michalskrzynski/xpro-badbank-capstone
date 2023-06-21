@@ -42,7 +42,7 @@ export default function CashierForm( {actionText, balance, amountValidationSchem
         <input
           type="number"
           id="amount"
-          className="form-control"
+          className="form-control pe-2"
           value={formik.values.amount}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}

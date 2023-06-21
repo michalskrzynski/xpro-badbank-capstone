@@ -1,35 +1,52 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Card } from "./Card";
-import { Link } from "react-router-dom";
+import moment from "moment";
 
-import { UserContext } from "./Context";
 import { oneFormat } from "../misc/oneFormat";
+import { UserContext } from "./Context";
+import TransactionRow from "./TransactionRow";
+import * as APIClient from "../comms/APIClient";
 
 export default function Welcome() {
-  const {contextValue, updateContextValue} = React.useContext(UserContext);
+  const { contextValue, updateContextValue } = React.useContext(UserContext);
+  const [transactions, setTransactions] = React.useState(Array());
+
+  useEffect(() => {
+    APIClient.transactions(contextValue.token)
+      .then((response) => setTransactions(response.body.transactions))
+      .catch((error) => console.error("Transactions retrieve error, ", error));
+  }, []);
+
+  const transactionRows = transactions.map((t) => {
+
+    return (
+      <TransactionRow transaction={t}/>
+    );
+  });
 
   return (
     <Card
-      header={`Welcome ${contextValue.user.name}!`}
+      header={`Welcome ${contextValue.user.name}! You are logged in.`}
       text={
         <div>
-          <p>You are logged in. </p>
-          <p>Your balance is <b>${ oneFormat( contextValue.user.balance )}</b></p>
+          <p>
+            Your balance is <b>{oneFormat(contextValue.user.balance)}</b>. Last
+            transactions below:
+          </p>
         </div>
       }
     >
-      <div className="d-grid gap-2 d-sm-flex justify-content-sm-center">
-        <Link to="/deposit/" className="nav-link">
-          <button type="button" className="btn btn-primary px-4 gap-3">
-            Deposit
-          </button>
-        </Link>
-        <Link to="/withdraw/" className="nav-link">
-          <button type="button" className="btn btn-outline-secondary px-4">
-            Withdraw
-          </button>
-        </Link>
-      </div>
+      <table className="table">
+        <thead className="thead-dark">
+          <tr>
+            <th scope="col">Date</th>
+            <th scope="col">$ Before</th>
+            <th scope="col">Operation</th>
+            <th scope="col">$ After</th>
+          </tr>
+        </thead>
+        <tbody>{transactionRows}</tbody>
+      </table>
     </Card>
   );
 }

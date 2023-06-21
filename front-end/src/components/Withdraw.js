@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext} from "react";
 import * as Yup from "yup"
 
 import { UserContext} from "./Context";
@@ -6,6 +6,7 @@ import * as APIClient from "../comms/APIClient";
 import { Card } from "./Card";
 import CashierForm from "./CashierForm";
 import { oneFormat } from "../misc/oneFormat";
+import {ConnectionMonitorContext} from "./ConnectionMonitor";
 
 // OK Includes a Bootstrap card with a form that has:
 // OK Withdraw input field 
@@ -22,6 +23,7 @@ import { oneFormat } from "../misc/oneFormat";
 // OK Success Message: When a user completes the withdrawal form, they receive a success message confirming that their withdraw was processed. 
 
 export default function Withdraw() {
+  const {state, setApiPromise } = useContext(ConnectionMonitorContext);
   const {contextValue, updateContextValue} = React.useContext(UserContext);
   const [balance, setBalance] = React.useState(() => contextValue.user.balance);
 
@@ -29,17 +31,18 @@ export default function Withdraw() {
 
   const handleMoneyAccepted = ( amount ) => {
 
-    APIClient.withdraw( contextValue.token, amount)
+    const promise = APIClient.withdraw( contextValue.token, amount)
       .then( response => {
         console.log('Deposit responded with:', response);
         contextValue.user = response.body.user;
         updateContextValue( contextValue );
 
         setBalance( contextValue.user.balance );
-        setTimeout( () => alert( `A withdrawal of ${ oneFormat( response.body.withdrawed )} has been processed. Your balance is: ${ oneFormat( contextValue.user.balance ) }`), 50 );
+        setTimeout( () => alert( `A withdrawal of ${ oneFormat( response.body.withdrawn )} has been processed. Your balance is: ${ oneFormat( contextValue.user.balance ) }`), 50 );
       })
       .catch( err => console.log('ERR when withdrawing', err) ); 
 
+    setApiPromise( promise );
     
   }
 

@@ -209,9 +209,9 @@ export default function CreateAccount() {
           >
             <hr />
             <div>
-              Name: {state.data.body.data.name} <br />
-              Email: {state.data.body.data.email} <br />
-              Account #: {state.data.body.data.account_number} <br />
+              Name: {state.data.body.user.name} <br />
+              Email: {state.data.body.user.email} <br />
+              Account #: {state.data.body.user.account_number} <br />
               Please check your email for verification link.
             </div>
           </Card>

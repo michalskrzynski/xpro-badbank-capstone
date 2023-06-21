@@ -3,7 +3,8 @@ import { useEffect } from "react";
 import { Card } from "./Card";
 import * as APIClient from "../comms/APIClient";
 import moment from 'moment'
-import numeral from "numeral";
+
+import { oneFormat } from "../misc/oneFormat";
 
 // All Data page includes the following functionality:
 // Track User Submissions: All user submissions appear on All Data page.
@@ -36,13 +37,11 @@ export default function AllData() {
         key={u._id}
         header={u.name}
       >
-        <p>Name: {u.name}</p>
-        <hr/>
         <p>Email: {u.email}</p>
-        <p>Password: stored in Amazon Cognito, hashed</p>
+        <p>Password: <span className="badge bg-primary">stored in Amazon Cognito, hashed</span></p>
         <hr/>
         <p>Account #: {u.account_number}</p>
-        <p>Balance: {numeral(u.balance/100).format("0,0.00")}</p>
+        <p>Balance: <b>{oneFormat(u.balance)}</b></p>
         <hr/>
         <p>Created at: {createdAtFormatted}</p>
       </Card>

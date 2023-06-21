@@ -10,7 +10,7 @@ export function Card(props, children) {
   }
 
   return (
-    <div className="card mb-3" style={{maxWidth: "26rem"}}>
+    <div className="card mb-3">
       <div className={classes()}>
         <b>{props.header}</b>
       </div>

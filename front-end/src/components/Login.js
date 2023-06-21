@@ -1,9 +1,10 @@
-import React, {useState} from "react";
+import React, {useState, useContext} from "react";
 import { UserContext } from "./Context";
 
 import { Card } from "./Card";
 import * as APIClient from "../comms/APIClient";
 import decodeJwt from "../misc/decodeJwt";
+import {ConnectionMonitorContext} from "./ConnectionMonitor";
 
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -13,6 +14,7 @@ import { saveRefreshToken } from "../misc/tokenStorage";
 
 export default function Login() {
   const {contextValue, updateContextValue} = React.useContext(UserContext);
+  const {state, setApiPromise } = useContext(ConnectionMonitorContext);
 
   const [status, setStatus] = useState( null );
   const [authUser, setAuthUser] = useState( null );
@@ -25,20 +27,21 @@ export default function Login() {
     },
 
     onSubmit: (values) => {
-      APIClient.loginUser( values.email, values.password ) 
+      const promise = APIClient.loginUser( values.email, values.password ) 
         .then( response => {
           const token = response.body.token;
           console.log("Logged in, response: ", response);
           const payload = decodeJwt( token );
 
-          window.location.href= '/#/welcome';
+          setTimeout( () => window.location.href= '/#/welcome', 100);
           updateContextValue( {token, user: payload.user, aws_auth: payload.aws_auth});
- 
           saveRefreshToken(response.body.RefreshToken);
         })
         .catch( err => {
           setStatus( "Invalid login or password."); 
         } );
+      
+      setApiPromise( promise );
     },
 
     validationSchema: Yup.object({
@@ -100,7 +103,7 @@ export default function Login() {
             className="btn btn-primary mt-4"
             disabled={!(Object.keys(formik.errors).length === 0) && "disabled"}
           >
-            Login
+            {state.loading ? "Loading..." : "Login"}
           </button>
         </div>
       </form>

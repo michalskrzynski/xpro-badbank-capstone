@@ -16,3 +16,7 @@ nav .active {
 input#amount {
   text-align: right;
 }
+
+.tooltip-hint::after {
+  content: "*";
+}

@@ -20,7 +20,7 @@ async function usersWithdraw(req, res, next) {
         
       return res.send({
         message: "ok",
-        withdrawed: req.amount,
+        withdrawn: req.amount,
         user: updatedUser,
         transaction: updatedUser.lastTransaction,
       });

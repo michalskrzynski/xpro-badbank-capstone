@@ -70,7 +70,7 @@ export default function App() {
     contextValue.user.name === null && userLoggedInBefore ? (
       <p>Reinitiating session...</p>
     ) : (
-      <div id="content">
+      <div id="content" className="container m-auto" style={{maxWidth: "720px", width:"80%"}}>
       <ConnectionMonitor>
       <HashRouter>
         <Nav pageHash={pageHash} handlePageHashChange={setPageHash} />
@@ -91,10 +91,9 @@ export default function App() {
       <hr />
       <footer>
         <div className="p-2">
-          License: MIT. 
-          {/* Project made by{" "}
+          License: MIT. | Project made by&nbsp;
           <a href="https://michalskrzynski.github.io/">Michal</a> for MIT xPro
-          MERN stack course. */}
+          MERN stack course.
         </div>
       </footer>
       </div>

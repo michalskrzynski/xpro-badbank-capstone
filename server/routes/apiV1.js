@@ -7,9 +7,10 @@ const usersCreate = require('../controllers/users-create');
 const usersLogin = require('../controllers/users-login');
 const usersRefresh = require('../controllers/users-refresh');
 const usersLogout = require('../controllers/users-logout');
-const usersDeposit = require('../controllers/users-deposit');
-const usersWithdraw = require('../controllers/users-withdraw');
-const usersWireTransfer = require('../controllers/users-wire-transfer');
+const transactionsDeposit = require('../controllers/transactions-deposit');
+const transactionsWithdraw = require('../controllers/transactions-withdraw');
+const transactionsWireTransfer = require('../controllers/transactions-wire-transfer');
+const transactions = require('../controllers/transactions')
 
 
 
@@ -42,18 +43,122 @@ function amountParam( req, res, next ) {
 
 /**
  * @swagger
- * /api/users:
+ * /api/v1/users:
  *   get:
  *     summary: Retrieve all users
  *     description: Returns a list of all users.
+ *     security:
+ *       - []
  *     responses:
  *       200:
  *         description: Successful response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
  */
 router.get('/users', usersAll);
-router.post('/users/refresh', usersRefresh );
+
+
+
+/**
+ * @swagger
+ * /api/v1/users/login:
+ *   post:
+ *     summary: Performs user login.
+ *     description: Logs in the user and yields access and Refresh token.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successfully logged in.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                 RefreshToken:
+ *                   type: string
+ *       403:
+ *         description: Invalid username or password, or user not yet validated.
+ *       500:
+ *         description: Internal server error.
+ */
 router.post('/users/login', usersLogin );
-router.post('/users/logout', usersLogout );
+
+
+
+/**
+ * @swagger
+ * /api/v1/users/refresh:
+ *   post:
+ *     summary: Refresh JWT token
+ *     description: Refreshes a JWT token and returns new access and Refresh tokens. Can be considered as other kind of login.
+ *     produces:
+ *       - application/json
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               RefreshToken:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successfully refreshed token.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                 RefreshToken:
+ *                   type: string
+ *       401:
+ *         description: Unauthorized. Invalid or expired refresh token.
+ *       500:
+ *         description: Internal server error.
+ */
+router.post('/users/refresh', usersRefresh );
+
+
+/**
+ * @swagger
+ * /api/v1/users/logout:
+ *   post:
+ *     summary: Log out an authenticated user.
+ *     description: Logs out the currently authenticated user and invalidates the session.
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content: 
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: 
+ *                   type: string
+ *                   example: ok
+ */
+router.post('/users/logout', authenticate, usersLogout );
+
+
 
 
 /** 
@@ -76,7 +181,7 @@ router.post('/users/logout', usersLogout );
  *               password:
  *                 type: string
  *     responses:
- *       201:
+ *       200:
  *         description: User created successfully
  *         content:
  *           application/json:
@@ -85,33 +190,245 @@ router.post('/users/logout', usersLogout );
  *               properties:
  *                 message:
  *                   type: string
- *                 data:
+ *                 user:
  *                   type: object
- *                   properties:
- *                     _id: string
- *                     name: string
- *                     email: string
- *                     account_number: string
- *                     created_at: 
- *                       type: string
- *                       format: date-time
- *       409:
- *         description: User already exists
+ *                   description: A newly created user object.
+ *                 error: 
+ *                   type: string
+ *                   description: Positive error, like "User already exists"
+ *       500:
+ *         description: Other error, like internal server error
+ */
+router.post('/users/create', usersCreate);
+
+
+/**
+ * @swagger
+ * securityDefinitions:
+ *   bearerAuth:
+ *     type: apiKey
+ *     name: Authorization
+ *     in: header
+ *     description: Bearer token for user authorization
+ * paths:
+ *   /api/v1/transactions/deposit:
+ *     post:
+ *       security:
+ *         - bearerAuth: []
+ *       tags:
+ *         - Transactions
+ *       summary: Deposits money into the user's account
+ *       description: This API endpoint allows users to deposit money into their account.
+ *       consumes:
+ *         - application/json
+ *       produces:
+ *         - application/json
+ *       requestBody:
+ *         required: true
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 message:
- *                   type: string
- *       500:
- *         description: Other error, like internal server error
+ *                 amount:
+ *                   type: number
+ *                   description: Amount to be deposited in cents.
+ *       responses:
+ *         '200':
+ *           description: Successful deposit
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   message:
+ *                     type: string
+ *                     description: Success message
+ *                   deposited:
+ *                     type: number
+ *                     description: Amount deposited in cents
+ *                   user:
+ *                     type: object
+ *                     description: User object after the deposit.
+ *                   transaction:
+ *                     type: object
+ *                     description: Transaction object of the transaction made.
+ *         '401':
+ *           description: Unauthorized - Invalid or missing token
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   error:
+ *                     type: string
+ *                     description: Error message
  */
-router.post('/users/create', usersCreate);
-router.post('/users/logout', authenticate, usersLogout );
-router.post('/users/deposit', authenticate, amountParam, usersDeposit );
-router.post('/users/withdraw', authenticate, amountParam, usersWithdraw );
-router.post('/users/wire-transfer', authenticate, amountParam, usersWireTransfer );
+router.post('/transactions/deposit', authenticate, amountParam, transactionsDeposit );
 
+
+/**
+ * @swagger
+ * paths:
+ *   /api/v1/transactions/withdraw:
+ *     post:
+ *       security:
+ *         - bearerAuth: []
+ *       tags:
+ *         - Transactions
+ *       summary: Withdraws money from the user's account
+ *       description: This API endpoint allows users to withdraw money from their account.
+ *       consumes:
+ *         - application/json
+ *       produces:
+ *         - application/json
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 amount:
+ *                   type: number
+ *                   description: Amount to be withdrawn in cents.
+ *       responses:
+ *         200:
+ *           description: Successful withdraw
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   message:
+ *                     type: string
+ *                     description: Success message
+ *                   error:
+ *                     type: string
+ *                     description: Positive error, like Insufficient funds
+ *                   withdrawn:
+ *                     type: number
+ *                     description: Amount withdrawn in cents
+ *                   user:
+ *                     type: object
+ *                     description: User object after the withdraw.
+ *                   transaction:
+ *                     type: object
+ *                     description: Transaction object if the transaction was successful.
+ *         401:
+ *           description: Unauthorized - Invalid or missing token
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   error:
+ *                     type: string
+ *                     description: Error message
+ */
+router.post('/transactions/withdraw', authenticate, amountParam, transactionsWithdraw );
+
+
+
+/**
+ * @swagger
+ * paths:
+ *   /api/v1/transactions/wire-transfer:
+ *     post:
+ *       security:
+ *         - bearerAuth: []
+ *       tags:
+ *         - Transactions
+ *       summary: Transfers money from authenticated user's account to one pointed by BBAN.
+ *       description: With this method user authenticated user can wire money to another.
+ *       consumes:
+ *         - application/json
+ *       requestBody:
+ *         required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 amount:
+ *                   type: number
+ *                   description: Amount to be sent in cents.
+ *                 receiverAccount:
+ *                   type: string
+ *                   description: Account number in format 1234-5678-9012-3456
+ *                 receiver:
+ *                   type: string
+ *                   description: Arbitrary receiver name, doesn't have to match the account owner name.
+ *                 description:
+ *                   type: string
+ *                   description: Arbitrary description.
+ *                 
+ *       responses:
+ *         '200':
+ *           description: Successfully made transfer
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   message:
+ *                     type: string
+ *                     description: Success message
+ *                   error:
+ *                     type: string
+ *                     description: Positive error, like - Insufficient funds
+ *                   transferred:
+ *                     type: number
+ *                     description: Amount transferred in cents.
+ *                   user:
+ *                     type: object
+ *                     description: User object after the transfer.
+ *                   transaction:
+ *                     type: object
+ *                     description: Transaction object if the transaction was successful.
+ *         '401':
+ *           description: Unauthorized - Invalid or missing token
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   error:
+ *                     type: string
+ *                     description: Error message
+ */
+router.post('/transactions/wire-transfer', authenticate, amountParam, transactionsWireTransfer );
+
+
+
+/**
+ * @swagger
+ * /api/v1/transactions:
+ *   post:
+ *     summary: Retrieve all user's transactions.
+ *     description: Returns the entire transaction history of the authenticated user.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Successful response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *       '401':
+ *         description: Unauthorized - Invalid or missing token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message
+ */
+router.post('/transactions', authenticate, transactions);
 
 module.exports = router;

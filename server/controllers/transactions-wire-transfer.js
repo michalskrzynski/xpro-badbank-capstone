@@ -11,9 +11,9 @@ async function usersWireTransfer(req, res, next) {
     return res.status(410).send("Wire negative amount or zero error.");
 
   
-    const receiver = await userDal.find({ account_number: req.body.receiverAccount });
+  const receiver = await userDal.find({ account_number: req.body.receiverAccount });
   if (!receiver)
-    res.send({ message: "error", error: "NoUserWithThatAccountNumber" });
+    return res.send({ message: "error", error: "User with the account number not found." });
 
   
   let updatedSender = null;
@@ -37,11 +37,8 @@ async function usersWireTransfer(req, res, next) {
   userDal.debit(userId, amount, debitTData)
     .then((user) => {
       //empty result is returned if userDal does not find the user with sufficient balance
-      if (!user)
-        return res.send({
-          message: "error",
-          error: "WithdrawInsufficientFunds",
-        });
+      if (!user) throw new Error("Insufficient funds");
+
       updatedSender = user;
       return user;
     })

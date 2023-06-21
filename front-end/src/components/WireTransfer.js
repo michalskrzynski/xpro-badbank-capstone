@@ -9,17 +9,7 @@ import { oneFormat } from "../misc/oneFormat";
 
 import { ConnectionMonitorContext } from "./ConnectionMonitor";
 
-// Includes a Bootstrap card with a form that has:
-// OK Deposit input field
-// OK Deposit button
-// OK Balance information displays above deposit form on the card
 
-// OK Not A Number Alert: User receives an alert if they add something that is not a number.
-// OK Negative Deposit Alert: User receives an alert if they try to deposit a negative number.
-// OK Disable deposit button if nothing is input
-
-// Deposit page should include the following functionality:
-// OK Success Message: When a user completes the deposit form, they receive a success message confirming their deposit was received.
 
 export default function WireTransfer() {
   const { state, setApiPromise } = useContext(ConnectionMonitorContext);
@@ -35,7 +25,6 @@ export default function WireTransfer() {
     },
     onSubmit: (values) => {
       handleWire(Math.round(values.amount * 100));
-      formik.handleReset();
     },
     validationSchema: Yup.object({
       receiver: Yup.string()
@@ -84,6 +73,8 @@ export default function WireTransfer() {
     )
       .then((response) => {
         console.log("Wire-transfer responded with:", response);
+        if( response.body.message === "error" ) return response;
+
         updateContextValue({ ...contextValue, user: response.body.user });
         setBalance(response.body.user.balance);
         setTimeout(
@@ -97,6 +88,7 @@ export default function WireTransfer() {
             ),
           50
         );
+        formik.handleReset();
         return response;
       })
       .catch((err) => {
@@ -112,6 +104,11 @@ export default function WireTransfer() {
       header={`${contextValue.user.name}, Wire transfer:`}
       title={`Current balance: ${oneFormat(balance)}`}
     >
+      {state.data && state.data.body.error ? (
+          <div className="alert alert-danger py-1 px-3 mb-1" role="alert">
+            <small>{state.data.body.error}</small>
+          </div>
+        ) : null}
       <form onSubmit={formik.handleSubmit}>
         <div className="form-group">
           <label htmlFor="receiver">Receiver name</label>

@@ -12,7 +12,7 @@ const menuOptions = [
   { hash: "#/welcome", secure: true, desc: "Welcome" },
   { hash: "#/deposit/", secure: true, desc: "Deposit" },
   { hash: "#/withdraw/", secure: true, desc: "Withdraw" },
-  { hash: "#/wire-transfer/", secure: true, desc: "Wire Transfer" },
+  { hash: "#/wire-transfer/", secure: true, desc: "Transfer" },
   { hash: "#/all-data/", desc: "All Data" },
 ];
 
@@ -20,13 +20,15 @@ function menuElements(secure, pageHash, handlePageHashChange) {
   const theElements = menuOptions.filter((e) => e.secure === secure || e.secure === undefined);
   return theElements.map((o, i) => (
     <li key={i} className={`"nav-item" ${pageHash === o.hash ? "active" : ""}`}>
+      <small>
       <Link
         to={o.hash.slice(1)}
-        className={`nav-link ps-2`}
+        className={`nav-link ps-1`}
         onClick={() => handlePageHashChange(o.hash)}
       >
         {o.desc}
       </Link>
+      </small>
     </li>
   ));
 }

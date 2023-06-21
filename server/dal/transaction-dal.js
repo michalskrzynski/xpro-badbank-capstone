@@ -9,8 +9,8 @@ const { ObjectId } = require('mongodb');
  * @returns Promise
  */
 async function forUser( userId ) {
-  const allUsers = await User.find({userId: userId}).exec();
-  return allUsers;
+  const allTransactions = await Transaction.find({userId: userId}).sort({ date: -1 }).exec();
+  return allTransactions;
 };
 
 
